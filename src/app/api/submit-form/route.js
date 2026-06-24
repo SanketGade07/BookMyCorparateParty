@@ -102,12 +102,12 @@ function venueDetailsHtml(p) {
     .join('');
 }
 
-async function pushToOdoo(p) {
+async function pushToOdoo(p, subdomainSource) {
   try {
     const venueLabel = VENUE_LABEL[p.formType] || p.event || 'Venue Enquiry';
     const uid = await xmlRpc('/xmlrpc/2/common', 'authenticate', [ODOO_DB, ODOO_USERNAME, ODOO_API_KEY, {}]);
     if (!uid) return;
-    const leadName = `${venueLabel} — ${p.city || 'Mumbai'}${p.isPartial ? ' (Partial Capture)' : ''}`;
+    const leadName = `[${subdomainSource}] ${venueLabel} — ${p.city || 'Mumbai'}${p.isPartial ? ' (Partial Capture)' : ''}`;
     const utmLines = [];
     if (p.utmSource)   utmLines.push(`UTM Source: ${p.utmSource}`);
     if (p.utmMedium)   utmLines.push(`UTM Medium: ${p.utmMedium}`);
@@ -120,6 +120,7 @@ async function pushToOdoo(p) {
       `Phone: ${p.phone}`,
       `Email: ${p.email || '—'}`,
       `Source (Heard via): ${p.source || '—'}`,
+      `Domain Source: ${subdomainSource}`,
       `Venue Type: ${venueLabel}`,
       `Lead Type: ${p.isPartial ? 'Step 1 capture (partial)' : 'Complete lead'}`,
       ...venueDetailsLines(p),
@@ -166,6 +167,14 @@ const getIndianTime = () => {
 
 export async function POST(req) {
   try {
+    const host = req.headers.get('host') || '';
+    let subdomainSource = 'ads';
+    if (host.includes('page.bookmycorporateparty.com')) {
+      subdomainSource = 'page.book';
+    } else if (host.includes('ads.bookmycorporateparty.com')) {
+      subdomainSource = 'ads';
+    }
+
     const payload = await req.json();
     const {
       name,
@@ -226,8 +235,8 @@ export async function POST(req) {
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 620px; margin: 0 auto; border: 1px solid #eee; border-radius: 10px; overflow: hidden;">
         <div style="background: #80281F; padding: 24px 32px;">
-          <h2 style="color: #fff; margin: 0; font-size: 20px;">New ${venueLabel} Enquiry${statusSuffix} — BookMyCorporateParty</h2>
-          <p style="color: rgba(255,255,255,0.8); margin: 6px 0 0; font-size: 13px;">Received at ${indianTime}</p>
+          <h2 style="color: #fff; margin: 0; font-size: 20px;">New ${venueLabel} Enquiry${statusSuffix} — BookMyCorporateParty [${subdomainSource}]</h2>
+          <p style="color: rgba(255,255,255,0.8); margin: 6px 0 0; font-size: 13px;">Received at ${indianTime} via ${subdomainSource}</p>
         </div>
         <div style="padding: 28px 32px; background: #fff;">
           <h3 style="color: #80281F; margin: 0 0 16px; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Contact Details</h3>
@@ -235,6 +244,7 @@ export async function POST(req) {
           <p style="margin: 0 0 8px;"><strong>WhatsApp Number:</strong> ${phone}</p>
           <p style="margin: 0 0 8px;"><strong>Email:</strong> ${email || '—'}</p>
           <p style="margin: 0 0 8px;"><strong>Heard About Us Via:</strong> ${source || '—'}</p>
+          <p style="margin: 0 0 8px;"><strong>Domain Source:</strong> ${subdomainSource}</p>
           <p style="margin: 0 0 8px;"><strong>WhatsApp Updates:</strong> ${whatsapp ? 'Yes' : 'No'}</p>
 
           <h3 style="color: #80281F; margin: 24px 0 16px; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px;">${venueLabel} Details</h3>
@@ -265,13 +275,13 @@ export async function POST(req) {
     await transporter.sendMail({
       from: `"BookMyCorporateParty Enquiry" <${process.env.NEXT_PUBLIC_EMAIL_USER}>`,
       to: process.env.NEXT_PUBLIC_EMAIL_RECEIVER,
-      subject: `New ${venueLabel} Enquiry${statusSuffix} from ${name}`,
+      subject: `[${subdomainSource}] New ${venueLabel} Enquiry${statusSuffix} from ${name}`,
       html: emailHtml,
-      text: `New ${venueLabel} enquiry${statusSuffix} from ${name} (${phone}, ${email || 'no-email'}). Source: ${source || '—'}. ${textSummary}. User Location: ${userLocation || 'Unknown'}. IP: ${userIp || 'Unknown'}. Submitted: ${indianTime}`,
+      text: `[Source: ${subdomainSource}] New ${venueLabel} enquiry${statusSuffix} from ${name} (${phone}, ${email || 'no-email'}). Source: ${source || '—'}. ${textSummary}. User Location: ${userLocation || 'Unknown'}. IP: ${userIp || 'Unknown'}. Submitted: ${indianTime}`,
     });
 
     // 2. Push to Odoo CRM (fire-and-forget)
-    pushToOdoo(payload);
+    pushToOdoo(payload, subdomainSource);
 
     // 3. Send to Google Sheets
     await sendToGoogleSheets(
@@ -313,7 +323,7 @@ export async function POST(req) {
         utmContent:  utmContent  || '',
         gclid:       gclid       || '',
         submittedAt: indianTime,
-        pageSource: formType ? (isPartial ? 'Hero Form (Partial Step 1)' : 'Hero Form (Dynamic)') : 'WhatsApp Popup',
+        pageSource: `${subdomainSource} - ${formType ? (isPartial ? 'Hero Form (Partial Step 1)' : 'Hero Form (Dynamic)') : 'WhatsApp Popup'}`,
       },
       formType ? `${formType} enquiry` : 'wa popup enquiry'
     );
