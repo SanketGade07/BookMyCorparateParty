@@ -10,6 +10,8 @@ const VENUE_LABEL = {
   villa: 'Villa / Resort',
   lounge: 'Lounge',
   banquet: 'Banquet',
+  nightclub: 'Night Club',
+  catering: 'Catering',
 };
 
 function xmlRpc(endpoint, method, params) {
@@ -45,20 +47,21 @@ function xmlRpc(endpoint, method, params) {
 }
 
 function venueDetailsLines(p) {
+  if (p.isPartial) {
+    return ['Lead Status: Step 1 Lead Capture (Contact & Venue Type captured, details pending)'];
+  }
   const t = p.formType;
   if (t === 'villa') {
     const lines = [
       `Check-In: ${p.checkInDate || '—'}`,
       `Check-Out: ${p.checkOutDate || '—'}`,
       `Total Pax: ${p.totalPax || '—'}`,
-      `Total Kids: ${p.totalKids || '0'}`,
+      `Food: ${p.food || '—'}`,
+      `Pricing Confirmed: ${p.pricingAccepted ? 'Yes' : 'No'}`,
     ];
-    if (parseInt(p.totalKids || '0', 10) > 0) lines.push(`Kids Age: ${p.kidsAge || '—'}`);
-    lines.push(`Food: ${p.food || '—'}`);
-    lines.push(`Pricing Confirmed: ${p.pricingAccepted ? 'Yes' : 'No'}`);
     return lines;
   }
-  if (t === 'lounge') {
+  if (t === 'lounge' || t === 'nightclub') {
     return [
       `Date: ${p.date || '—'}`,
       `Day: ${p.day || '—'}`,
@@ -69,7 +72,7 @@ function venueDetailsLines(p) {
       `Type of Meal: ${p.typeOfMeal || '—'}`,
     ];
   }
-  if (t === 'banquet') {
+  if (t === 'banquet' || t === 'catering') {
     return [
       `Date: ${p.date || '—'}`,
       `Day: ${p.day || '—'}`,
@@ -104,7 +107,7 @@ async function pushToOdoo(p) {
     const venueLabel = VENUE_LABEL[p.formType] || p.event || 'Venue Enquiry';
     const uid = await xmlRpc('/xmlrpc/2/common', 'authenticate', [ODOO_DB, ODOO_USERNAME, ODOO_API_KEY, {}]);
     if (!uid) return;
-    const leadName = `${venueLabel} — ${p.city || 'Mumbai'}`;
+    const leadName = `${venueLabel} — ${p.city || 'Mumbai'}${p.isPartial ? ' (Partial Capture)' : ''}`;
     const utmLines = [];
     if (p.utmSource)   utmLines.push(`UTM Source: ${p.utmSource}`);
     if (p.utmMedium)   utmLines.push(`UTM Medium: ${p.utmMedium}`);
@@ -118,6 +121,7 @@ async function pushToOdoo(p) {
       `Email: ${p.email || '—'}`,
       `Source (Heard via): ${p.source || '—'}`,
       `Venue Type: ${venueLabel}`,
+      `Lead Type: ${p.isPartial ? 'Step 1 capture (partial)' : 'Complete lead'}`,
       ...venueDetailsLines(p),
       ...(utmLines.length ? ['--- Ad Tracking ---', ...utmLines] : []),
       `WhatsApp Updates: ${p.whatsapp ? 'Yes' : 'No'}`,
@@ -182,6 +186,7 @@ export async function POST(req) {
       utmTerm,
       utmContent,
       gclid,
+      isPartial,
     } = payload;
 
     const hasUtm = !!(utmSource || utmMedium || utmCampaign || gclid);
@@ -207,6 +212,7 @@ export async function POST(req) {
 
     const venueLabel = VENUE_LABEL[formType] || event || 'Venue Enquiry';
     const indianTime = getIndianTime();
+    const statusSuffix = isPartial ? ' (Partial Lead)' : '';
 
     // 1. Send email
     const transporter = nodemailer.createTransport({
@@ -220,7 +226,7 @@ export async function POST(req) {
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 620px; margin: 0 auto; border: 1px solid #eee; border-radius: 10px; overflow: hidden;">
         <div style="background: #80281F; padding: 24px 32px;">
-          <h2 style="color: #fff; margin: 0; font-size: 20px;">New ${venueLabel} Enquiry — BookMyCorporateParty</h2>
+          <h2 style="color: #fff; margin: 0; font-size: 20px;">New ${venueLabel} Enquiry${statusSuffix} — BookMyCorporateParty</h2>
           <p style="color: rgba(255,255,255,0.8); margin: 6px 0 0; font-size: 13px;">Received at ${indianTime}</p>
         </div>
         <div style="padding: 28px 32px; background: #fff;">
@@ -259,9 +265,9 @@ export async function POST(req) {
     await transporter.sendMail({
       from: `"BookMyCorporateParty Enquiry" <${process.env.NEXT_PUBLIC_EMAIL_USER}>`,
       to: process.env.NEXT_PUBLIC_EMAIL_RECEIVER,
-      subject: `New ${venueLabel} Enquiry from ${name}`,
+      subject: `New ${venueLabel} Enquiry${statusSuffix} from ${name}`,
       html: emailHtml,
-      text: `New ${venueLabel} enquiry from ${name} (${phone}, ${email || 'no-email'}). Source: ${source || '—'}. ${textSummary}. User Location: ${userLocation || 'Unknown'}. IP: ${userIp || 'Unknown'}. Submitted: ${indianTime}`,
+      text: `New ${venueLabel} enquiry${statusSuffix} from ${name} (${phone}, ${email || 'no-email'}). Source: ${source || '—'}. ${textSummary}. User Location: ${userLocation || 'Unknown'}. IP: ${userIp || 'Unknown'}. Submitted: ${indianTime}`,
     });
 
     // 2. Push to Odoo CRM (fire-and-forget)
@@ -270,7 +276,7 @@ export async function POST(req) {
     // 3. Send to Google Sheets
     await sendToGoogleSheets(
       {
-        formType: venueLabel,
+        formType: venueLabel + statusSuffix,
         name,
         phone,
         email: email || '',
@@ -307,7 +313,7 @@ export async function POST(req) {
         utmContent:  utmContent  || '',
         gclid:       gclid       || '',
         submittedAt: indianTime,
-        pageSource: formType ? 'Hero Form (Dynamic)' : 'WhatsApp Popup',
+        pageSource: formType ? (isPartial ? 'Hero Form (Partial Step 1)' : 'Hero Form (Dynamic)') : 'WhatsApp Popup',
       },
       formType ? `${formType} enquiry` : 'wa popup enquiry'
     );

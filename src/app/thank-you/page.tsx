@@ -26,11 +26,23 @@ function ThankYouContent() {
         currency: "INR",
       });
     }
+
+    // Trigger PDF download automatically when user lands on Thank You page
+    const link = document.createElement("a");
+    link.href = "/api/download-pdf";
+    link.download = "bookmycorporateparty.pdf";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }, []);
 
   useEffect(() => {
     if (isChat) {
-      window.location.href = WA;
+      // Delay redirection to WhatsApp to allow the download to start
+      const timer = setTimeout(() => {
+        window.location.href = WA;
+      }, 1500);
+      return () => clearTimeout(timer);
     }
   }, [isChat]);
 
@@ -51,6 +63,18 @@ function ThankYouContent() {
         {isChat
           ? "We've received your details. Redirecting you to WhatsApp now…"
           : "Your enquiry has been submitted. Our team will reach out with curated venue options within 30 minutes."}
+      </p>
+
+      <p style={{ fontSize: 14, color: "#6B7280", maxWidth: 420, textAlign: "center", margin: "8px 0 0", lineHeight: 1.5 }}>
+        Your corporate party brochure is downloading automatically.{" "}
+        <a
+          href="/api/download-pdf"
+          download="bookmycorporateparty.pdf"
+          style={{ color: R, textDecoration: "underline", fontWeight: 700 }}
+        >
+          Click here
+        </a>{" "}
+        if it did not start.
       </p>
 
       {/* WhatsApp button — always visible */}

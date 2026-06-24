@@ -102,12 +102,14 @@ function VenueCard({ v }: { v: Venue }) {
   );
 }
 
-type FormType = '' | 'villa' | 'lounge' | 'banquet';
+type FormType = '' | 'villa' | 'lounge' | 'banquet' | 'nightclub' | 'catering';
 
 const VENUE_LABEL: Record<Exclude<FormType, ''>, string> = {
   villa: 'Villa / Resort',
   lounge: 'Lounge',
   banquet: 'Banquet',
+  nightclub: 'Night Club',
+  catering: 'Catering',
 };
 
 const SOURCE_OPTIONS = ['Google', 'Instagram', 'Facebook', 'WhatsApp', 'Friend', 'Other'];
@@ -122,14 +124,30 @@ const dayFromDate = (iso: string): string => {
 export default function BMCPLanding() {
   const router = useRouter();
 
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
+  const [otpVerified, setOtpVerified] = useState(false);
+
+  const isValidPhone = (p: string) => p.replace(/\D/g, '').length >= 10;
+
+  const handleSendOtp = () => {
+    setOtpSent(true);
+    setOtpVerified(false);
+    setOtpCode('');
+  };
+
+  const handleVerifyOtp = () => {
+    if (otpCode.length >= 4) {
+      setOtpVerified(true);
+    }
+  };
+
   const [formData, setFormData] = useState({
     formType: '' as FormType,
     // Villa / Resort
     checkInDate: '',
     checkOutDate: '',
     totalPax: '',
-    totalKids: '',
-    kidsAge: '',
     food: '',
     pricingAccepted: false,
     // Lounge & Banquet shared
@@ -166,6 +184,88 @@ export default function BMCPLanding() {
   const userGeo = useGeoLocation();
   const visitorTracked = useRef(false);
   const testimonialRowRef = useRef<HTMLDivElement>(null);
+
+  const isSubmittedRef = useRef(false);
+  const partialSentRef = useRef(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const formDataRef = useRef(formData);
+  const utmDataRef = useRef(utmData);
+  const userGeoRef = useRef(userGeo);
+
+  // Sync refs to avoid stale state in event listeners
+  useEffect(() => {
+    formDataRef.current = formData;
+  }, [formData]);
+
+  useEffect(() => {
+    utmDataRef.current = utmData;
+  }, [utmData]);
+
+  useEffect(() => {
+    userGeoRef.current = userGeo;
+  }, [userGeo]);
+
+  const sendPartialLead = () => {
+    if (partialSentRef.current || isSubmittedRef.current) return;
+    const f = formDataRef.current;
+    if (!f.formType || !f.name || !f.whatsappNumber || !isValidPhone(f.whatsappNumber)) return;
+
+    partialSentRef.current = true;
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+
+    const venueLabel = f.formType ? VENUE_LABEL[f.formType] : '';
+    const uGeo = userGeoRef.current;
+    const uUtm = utmDataRef.current;
+
+    fetch('/api/submit-form', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      keepalive: true,
+      body: JSON.stringify({
+        isPartial: true,
+        formType: f.formType,
+        name: f.name,
+        phone: f.whatsappNumber,
+        email: f.email,
+        source: f.source,
+        whatsapp: true,
+        event: venueLabel,
+        city: 'Mumbai',
+        area: '',
+        venueDate: '',
+        userLocation: uGeo ? `${uGeo.city}, ${uGeo.region}, ${uGeo.country}` : 'Unknown',
+        userPincode: uGeo ? uGeo.pincode : 'Unknown',
+        userIp: uGeo ? uGeo.ip : 'Unknown',
+        ...uUtm,
+      }),
+    }).catch(() => {});
+  };
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        sendPartialLead();
+      }
+    };
+    const handleBeforeUnload = () => {
+      sendPartialLead();
+    };
+
+    window.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, []);
 
   // Capture UTM parameters from URL on mount and auto-fill Source dropdown
   useEffect(() => {
@@ -241,39 +341,58 @@ export default function BMCPLanding() {
     router.push('/thank-you?chat=1');
   };
 
-  const handleStep1 = (e: React.FormEvent) => {
+  const handleStep1 = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isStep1Valid()) return;
+
+    isSubmittedRef.current = false;
+    partialSentRef.current = false;
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+
     setFormStep(2);
+
+    timerRef.current = setTimeout(() => {
+      sendPartialLead();
+    }, 45000);
   };
 
   const isStep1Valid = () => {
     const f = formData;
-    if (!f.formType) return false;
-    if (f.formType === 'villa') {
-      if (!f.checkInDate || !f.checkOutDate || !f.totalPax || f.totalKids === '' || !f.food) return false;
-      if (parseInt(f.totalKids || '0', 10) > 0 && !f.kidsAge) return false;
-      return true;
-    }
-    if (f.formType === 'lounge') {
-      return !!(f.date && f.noOfPeople && f.location && f.budgetOnlyFood && f.budgetWithDrinks && f.typeOfMeal);
-    }
-    if (f.formType === 'banquet') {
-      return !!(f.date && f.noOfPeople && f.location && f.foodType && f.budget);
-    }
-    return false;
+    return !!(f.formType && f.name && f.whatsappNumber && f.email && f.source && isValidPhone(f.whatsappNumber));
   };
 
   const isStep2Valid = () => {
     const f = formData;
-    if (!f.name || !f.whatsappNumber || !f.email || !f.source) return false;
-    if (f.formType === 'villa' && !f.pricingAccepted) return false;
-    return true;
+    if (!f.formType) return false;
+    if (f.formType === 'villa') {
+      if (!f.checkInDate || !f.checkOutDate || !f.totalPax || !f.food) return false;
+      if (parseInt(f.totalPax || '0', 10) < 20) return false;
+      if (!f.pricingAccepted) return false;
+      return true;
+    }
+    if (f.formType === 'lounge' || f.formType === 'nightclub') {
+      if (!(f.date && f.noOfPeople && f.location && f.budgetOnlyFood && f.budgetWithDrinks && f.typeOfMeal)) return false;
+      return parseInt(f.noOfPeople || '0', 10) >= 20;
+    }
+    if (f.formType === 'banquet' || f.formType === 'catering') {
+      if (!(f.date && f.noOfPeople && f.location && f.foodType && f.budget)) return false;
+      return parseInt(f.noOfPeople || '0', 10) >= 20;
+    }
+    return false;
   };
 
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     if (!isStep2Valid()) return;
+
+    isSubmittedRef.current = true;
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+
     setFormStatus('submitting');
     setFormMsg('');
     try {
@@ -296,8 +415,6 @@ export default function BMCPLanding() {
           checkInDate: f.checkInDate,
           checkOutDate: f.checkOutDate,
           totalPax: f.totalPax,
-          totalKids: f.totalKids,
-          kidsAge: f.kidsAge,
           food: f.food,
           pricingAccepted: f.pricingAccepted,
           // Lounge / Banquet
@@ -326,12 +443,15 @@ export default function BMCPLanding() {
       if (res.ok && data.success) {
         setFormData({
           formType: '' as FormType,
-          checkInDate: '', checkOutDate: '', totalPax: '', totalKids: '', kidsAge: '', food: '', pricingAccepted: false,
+          checkInDate: '', checkOutDate: '', totalPax: '', food: '', pricingAccepted: false,
           date: '', noOfPeople: '', location: '',
           budgetOnlyFood: '', budgetWithDrinks: '', typeOfMeal: '',
           foodType: '', budget: '',
           name: '', whatsappNumber: '', email: '', source: '',
         });
+        setOtpSent(false);
+        setOtpCode('');
+        setOtpVerified(false);
         setFormStep(1);
         router.push('/thank-you');
       } else {
@@ -749,18 +869,18 @@ export default function BMCPLanding() {
           </div>
           {/* Form */}
           <div id="hero-form" className="hero-form-card" style={{ flex: "1 1 360px", background: "#fff", borderRadius: 14, padding: "22px 20px", boxShadow: "0 24px 48px rgba(0,0,0,0.15)" }}>
-            {/* Step indicator */}
-            {formStatus !== 'success' && (
-              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 14 }}>
-                {[1, 2].map(s => (
-                  <div key={s} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                    <div style={{ width: 22, height: 22, borderRadius: "50%", background: formStep >= s ? R : B, color: formStep >= s ? "#fff" : G, fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.3s" }}>{s}</div>
-                    <span style={{ fontSize: 11, fontWeight: 600, color: formStep >= s ? D : G }}>{s === 1 ? "Venue Details" : "Your Contact"}</span>
-                    {s === 1 && <div style={{ width: 28, height: 1, background: formStep === 2 ? R : B, marginLeft: 2, transition: "background 0.3s" }} />}
-                  </div>
-                ))}
-              </div>
-            )}
+             {/* Step indicator */}
+             {formStatus !== 'success' && (
+               <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 14 }}>
+                 {[1, 2].map(s => (
+                   <div key={s} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                     <div style={{ width: 22, height: 22, borderRadius: "50%", background: formStep >= s ? R : B, color: formStep >= s ? "#fff" : G, fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.3s" }}>{s}</div>
+                     <span style={{ fontSize: 11, fontWeight: 600, color: formStep >= s ? D : G }}>{s === 1 ? "Your Contact" : "Venue Details"}</span>
+                     {s === 1 && <div style={{ width: 28, height: 1, background: formStep === 2 ? R : B, marginLeft: 2, transition: "background 0.3s" }} />}
+                   </div>
+                 ))}
+               </div>
+             )}
 
             {formStatus === 'success' ? (
               <div style={{ textAlign: "center", padding: "28px 0" }}>
@@ -773,7 +893,7 @@ export default function BMCPLanding() {
               </div>
 
             ) : formStep === 1 ? (
-              /* ── STEP 1: Venue-specific details ── */
+              /* ── STEP 1: Contact details + select dropdown ── */
               <form onSubmit={handleStep1}>
                 <h3 style={{ margin: "0 0 2px", fontSize: 17, fontWeight: 700, color: D }}>Get Venue Options Free</h3>
                 <p style={{ margin: "0 0 14px", fontSize: 12, color: G }}>Free for HR & Admin teams. Options within 30 minutes.</p>
@@ -785,8 +905,71 @@ export default function BMCPLanding() {
                     <option value="" disabled>Select venue type</option>
                     <option value="villa">Villa / Resort</option>
                     <option value="lounge">Lounge</option>
+                    <option value="nightclub">Night Club</option>
                     <option value="banquet">Banquet</option>
+                    <option value="catering">Catering</option>
                   </select>
+                </div>
+
+                <div style={{ marginBottom: 10 }}>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Your Name *</label>
+                  <input required type="text" placeholder="e.g. Priya Sharma" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
+                </div>
+
+                <div style={{ marginBottom: 10 }}>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>WhatsApp Number *</label>
+                  <div style={{ display: "flex", gap: 6 }}>
+                    <input required type="tel" placeholder="e.g. 9876543210" value={formData.whatsappNumber} onChange={e => setFormData({ ...formData, whatsappNumber: e.target.value })} style={{ flex: 1, padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
+                    <button type="button" onClick={handleSendOtp} disabled={!isValidPhone(formData.whatsappNumber) || otpSent} style={{ background: (isValidPhone(formData.whatsappNumber) && !otpSent) ? R : "#aaa", color: "#fff", border: "none", borderRadius: 7, padding: "0 12px", fontSize: 11, fontWeight: 700, cursor: (isValidPhone(formData.whatsappNumber) && !otpSent) ? "pointer" : "not-allowed", transition: "all 0.2s" }}>
+                      {otpSent ? "OTP Sent" : "Send OTP"}
+                    </button>
+                  </div>
+                  {otpSent && (
+                    <div style={{ marginTop: 8, display: "flex", gap: 6, alignItems: "center" }}>
+                      <input type="text" maxLength={6} placeholder="Enter OTP (Optional)" value={otpCode} onChange={e => setOtpCode(e.target.value)} style={{ width: 120, padding: "8px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 12, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} />
+                      <button type="button" onClick={handleVerifyOtp} disabled={otpVerified || !otpCode} style={{ background: (otpVerified || !otpCode) ? "#aaa" : "#16A34A", color: "#fff", border: "none", borderRadius: 7, padding: "8px 14px", fontSize: 11, fontWeight: 700, cursor: (otpVerified || !otpCode) ? "default" : "pointer" }}>
+                        {otpVerified ? "✓ Verified" : "Verify"}
+                      </button>
+                      <button type="button" onClick={() => setOtpSent(false)} style={{ background: "none", border: "none", color: R, fontSize: 11, fontWeight: 600, cursor: "pointer", padding: 0 }}>Resend</button>
+                    </div>
+                  )}
+                  {otpVerified && (
+                    <span style={{ display: "block", color: "#16A34A", fontSize: 10, fontWeight: 600, marginTop: 4 }}>✓ OTP verified successfully (Mock)</span>
+                  )}
+                </div>
+
+                <div style={{ marginBottom: 10 }}>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Email *</label>
+                  <input required type="email" placeholder="you@company.com" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
+                </div>
+
+                <div style={{ marginBottom: 12 }}>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>How did you hear about us? *</label>
+                  <select required value={formData.source} onChange={e => setFormData({ ...formData, source: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif", background: "#fff", color: formData.source ? D : G, appearance: "none", backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B}>
+                    <option value="" disabled>Select source</option>
+                    {SOURCE_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+
+                <button type="submit" disabled={!isStep1Valid()} style={{ width: "100%", padding: "11px 0", background: isStep1Valid() ? R : "#aaa", color: "#fff", border: "none", borderRadius: 8, fontSize: 14, fontWeight: 700, cursor: isStep1Valid() ? "pointer" : "not-allowed", fontFamily: "var(--font-dm-sans), sans-serif", boxShadow: "0 4px 14px rgba(192,57,43,0.2)", marginTop: 4 }}>
+                  NEXT →
+                </button>
+                <p style={{ fontSize: 10, color: "#999", textAlign: "center", margin: "6px 0 0" }}>Free service · No spam · No obligations</p>
+              </form>
+
+            ) : (
+              /* ── STEP 2: Venue-specific details (+ pricing tick for Villa) ── */
+              <form onSubmit={handleSubmit}>
+                <h3 style={{ margin: "0 0 2px", fontSize: 17, fontWeight: 700, color: D }}>Almost there!</h3>
+                <p style={{ margin: "0 0 4px", fontSize: 12, color: G }}>Please share the details of your booking.</p>
+
+                {/* Summary pill */}
+                <div style={{ background: L, border: `1px solid ${B}`, borderRadius: 8, padding: "8px 12px", marginBottom: 14, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <span style={{ fontSize: 12, color: D, fontWeight: 700 }}>👤 {formData.name} ({formData.whatsappNumber})</span>
+                    <span style={{ fontSize: 10, color: G }}>📍 {formData.formType ? VENUE_LABEL[formData.formType] : ''}</span>
+                  </div>
+                  <button type="button" onClick={() => setFormStep(1)} style={{ background: "none", border: "none", color: R, fontSize: 11, fontWeight: 700, cursor: "pointer", padding: 0 }}>Edit</button>
                 </div>
 
                 {/* ──── VILLA / RESORT ──── */}
@@ -803,28 +986,18 @@ export default function BMCPLanding() {
                       </div>
                     </div>
 
-                    <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-                      <div style={{ flex: 1 }}>
-                        <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Total Pax *</label>
-                        <input required type="number" min="1" placeholder="e.g. 8" value={formData.totalPax} onChange={e => setFormData({ ...formData, totalPax: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Total Kids *</label>
-                        <input required type="number" min="0" placeholder="0" value={formData.totalKids} onChange={e => setFormData({ ...formData, totalKids: e.target.value, kidsAge: e.target.value === '0' ? '' : formData.kidsAge })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                      </div>
+                    <div style={{ marginBottom: 10 }}>
+                      <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Total Pax (Min 20) *</label>
+                      <input required type="number" min="20" placeholder="e.g. 25 (Min 20)" value={formData.totalPax} onChange={e => setFormData({ ...formData, totalPax: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
+                      {formData.totalPax && parseInt(formData.totalPax, 10) < 20 && (
+                        <span style={{ display: "block", color: "#DC2626", fontSize: 10, fontWeight: 600, marginTop: 4 }}>⚠️ Minimum 20 pax required</span>
+                      )}
                     </div>
-
-                    {parseInt(formData.totalKids || '0', 10) > 0 && (
-                      <div style={{ marginBottom: 10 }}>
-                        <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Kids Age (years) *</label>
-                        <input required type="text" placeholder="e.g. 5, 8" value={formData.kidsAge} onChange={e => setFormData({ ...formData, kidsAge: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                      </div>
-                    )}
 
                     <div style={{ marginBottom: 10 }}>
                       <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 6 }}>Food *</label>
                       <div style={{ display: "flex", gap: 6 }}>
-                        {['Veg', 'Non-Veg', 'Pure Veg'].map(opt => {
+                        {['Pure Veg', 'Veg / Non-Veg'].map(opt => {
                           const sel = formData.food === opt;
                           return (
                             <label key={opt} style={{ flex: 1, textAlign: "center", padding: "8px 4px", border: `1px solid ${sel ? R : B}`, borderRadius: 7, fontSize: 12, fontWeight: 600, color: sel ? R : D, background: sel ? L : "#fff", cursor: "pointer" }}>
@@ -838,8 +1011,8 @@ export default function BMCPLanding() {
                   </>
                 )}
 
-                {/* ──── LOUNGE ──── */}
-                {formData.formType === 'lounge' && (
+                {/* ──── LOUNGE / NIGHT CLUB ──── */}
+                {(formData.formType === 'lounge' || formData.formType === 'nightclub') && (
                   <>
                     <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
                       <div style={{ flex: 1 }}>
@@ -854,8 +1027,11 @@ export default function BMCPLanding() {
 
                     <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
                       <div style={{ flex: 1 }}>
-                        <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>No. of People *</label>
-                        <input required type="number" min="1" placeholder="e.g. 25" value={formData.noOfPeople} onChange={e => setFormData({ ...formData, noOfPeople: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
+                        <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>No. of People (Min 20) *</label>
+                        <input required type="number" min="20" placeholder="e.g. 25 (Min 20)" value={formData.noOfPeople} onChange={e => setFormData({ ...formData, noOfPeople: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
+                        {formData.noOfPeople && parseInt(formData.noOfPeople, 10) < 20 && (
+                          <span style={{ display: "block", color: "#DC2626", fontSize: 10, fontWeight: 600, marginTop: 4 }}>⚠️ Minimum 20 pax required</span>
+                        )}
                       </div>
                       <div style={{ flex: 1 }}>
                         <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Location *</label>
@@ -891,8 +1067,8 @@ export default function BMCPLanding() {
                   </>
                 )}
 
-                {/* ──── BANQUET ──── */}
-                {formData.formType === 'banquet' && (
+                {/* ──── BANQUET / CATERING ──── */}
+                {(formData.formType === 'banquet' || formData.formType === 'catering') && (
                   <>
                     <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
                       <div style={{ flex: 1 }}>
@@ -907,8 +1083,11 @@ export default function BMCPLanding() {
 
                     <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
                       <div style={{ flex: 1 }}>
-                        <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>No. of People *</label>
-                        <input required type="number" min="1" placeholder="e.g. 100" value={formData.noOfPeople} onChange={e => setFormData({ ...formData, noOfPeople: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
+                        <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>No. of People (Min 20) *</label>
+                        <input required type="number" min="20" placeholder="e.g. 100 (Min 20)" value={formData.noOfPeople} onChange={e => setFormData({ ...formData, noOfPeople: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
+                        {formData.noOfPeople && parseInt(formData.noOfPeople, 10) < 20 && (
+                          <span style={{ display: "block", color: "#DC2626", fontSize: 10, fontWeight: 600, marginTop: 4 }}>⚠️ Minimum 20 pax required</span>
+                        )}
                       </div>
                       <div style={{ flex: 1 }}>
                         <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Location *</label>
@@ -919,7 +1098,7 @@ export default function BMCPLanding() {
                     <div style={{ marginBottom: 10 }}>
                       <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 6 }}>Food Type *</label>
                       <div style={{ display: "flex", gap: 6 }}>
-                        {['Veg', 'Non-Veg', 'Pure Veg'].map(opt => {
+                        {['Pure Veg', 'Veg / Non-Veg'].map(opt => {
                           const sel = formData.foodType === opt;
                           return (
                             <label key={opt} style={{ flex: 1, textAlign: "center", padding: "8px 4px", border: `1px solid ${sel ? R : B}`, borderRadius: 7, fontSize: 12, fontWeight: 600, color: sel ? R : D, background: sel ? L : "#fff", cursor: "pointer" }}>
@@ -937,47 +1116,6 @@ export default function BMCPLanding() {
                     </div>
                   </>
                 )}
-
-                <button type="submit" disabled={!isStep1Valid()} style={{ width: "100%", padding: "11px 0", background: isStep1Valid() ? R : "#aaa", color: "#fff", border: "none", borderRadius: 8, fontSize: 14, fontWeight: 700, cursor: isStep1Valid() ? "pointer" : "not-allowed", fontFamily: "var(--font-dm-sans), sans-serif", boxShadow: "0 4px 14px rgba(192,57,43,0.2)", marginTop: 4 }}>
-                  NEXT →
-                </button>
-                <p style={{ fontSize: 10, color: "#999", textAlign: "center", margin: "6px 0 0" }}>Free service · No spam · No obligations</p>
-              </form>
-
-            ) : (
-              /* ── STEP 2: Contact + Source (+ pricing tick for Villa) ── */
-              <form onSubmit={handleSubmit}>
-                <h3 style={{ margin: "0 0 2px", fontSize: 17, fontWeight: 700, color: D }}>Almost there!</h3>
-                <p style={{ margin: "0 0 4px", fontSize: 12, color: G }}>Where should we send the venue options?</p>
-
-                {/* Summary pill */}
-                <div style={{ background: L, border: `1px solid ${B}`, borderRadius: 8, padding: "8px 12px", marginBottom: 14, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontSize: 12, color: D, fontWeight: 600 }}>📍 {formData.formType ? VENUE_LABEL[formData.formType] : ''}</span>
-                  <button type="button" onClick={() => setFormStep(1)} style={{ background: "none", border: "none", color: R, fontSize: 11, fontWeight: 700, cursor: "pointer", padding: 0 }}>Edit</button>
-                </div>
-
-                <div style={{ marginBottom: 10 }}>
-                  <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Your Name *</label>
-                  <input required type="text" placeholder="e.g. Priya Sharma" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                </div>
-
-                <div style={{ marginBottom: 10 }}>
-                  <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>WhatsApp Number *</label>
-                  <input required type="tel" placeholder="+91 98765 43210" value={formData.whatsappNumber} onChange={e => setFormData({ ...formData, whatsappNumber: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                </div>
-
-                <div style={{ marginBottom: 10 }}>
-                  <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Email *</label>
-                  <input required type="email" placeholder="you@company.com" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                </div>
-
-                <div style={{ marginBottom: 12 }}>
-                  <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>How did you hear about us? *</label>
-                  <select required value={formData.source} onChange={e => setFormData({ ...formData, source: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif", background: "#fff", color: formData.source ? D : G, appearance: "none", backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B}>
-                    <option value="" disabled>Select source</option>
-                    {SOURCE_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
-                  </select>
-                </div>
 
                 {formData.formType === 'villa' && (
                   <label style={{ display: "flex", gap: 10, alignItems: "flex-start", fontSize: 12, color: D, marginBottom: 12, cursor: "pointer", background: L, border: `1px solid ${B}`, borderRadius: 8, padding: "10px 12px" }}>
