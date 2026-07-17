@@ -1,4 +1,4 @@
-import { DM_Sans, Playfair_Display } from "next/font/google";
+import { DM_Sans, Playfair_Display, Unbounded } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
@@ -14,6 +14,12 @@ const playfair = Playfair_Display({
   weight: ["600", "700"],
 });
 
+const unbounded = Unbounded({
+  subsets: ["latin"],
+  variable: "--font-unbounded",
+  weight: ["400", "700", "800"],
+});
+
 export const metadata = {
   title: "Book Corporate Party Venues in 30 Minutes | Free for HR Teams",
   description: "Planning a corporate party? Submit one enquiry and get 3–5 curated venue options with pricing in 30 minutes. Free for HR and Admin teams. No cold calls.",
@@ -24,7 +30,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${dmSans.variable} ${playfair.variable}`}>
+    <html lang="en" className={`${dmSans.variable} ${playfair.variable} ${unbounded.variable}`}>
       <body style={{ fontFamily: "var(--font-dm-sans), sans-serif", margin: 0 }}>
         {children}
       </body>

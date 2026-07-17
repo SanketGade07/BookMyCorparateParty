@@ -4,6 +4,11 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import useGeoLocation from "../hooks/useGeoLocation";
+import dynamic from "next/dynamic";
+
+const ReviewsSection = dynamic(() => import("../components/ReviewsSection"), { ssr: false });
+const InstagramWidget = dynamic(() => import("../components/InstagramWidget"), { ssr: false });
+const CompanyLogoSlider = dynamic(() => import("../components/CompanyLogoSlider"), { ssr: false });
 
 const R = "#80281F";
 const D = "#1A1A1A";
@@ -1140,6 +1145,9 @@ export default function BMCPLanding() {
         </div>
       </section>
 
+      {/* ===== COMPANY AUTO LOGO MARQUEE SLIDER ===== */}
+      <CompanyLogoSlider />
+
       {/* ===== 2. WHY CHOOSE US ===== */}
       <Sec bg="#FAFAFA" id="why-us">
         <div style={{ textAlign: "center", marginBottom: 28 }}>
@@ -1208,6 +1216,7 @@ export default function BMCPLanding() {
       </Sec>
 
       {/* ===== TRUSTED BY LEADING CORPORATES ===== */}
+      {/* ===== TRUSTED BY LEADING CORPORATES (COMMENTED OUT) =====
       <section className="trusted-section" style={{ background: R, position: "relative", overflow: "hidden", padding: "60px clamp(100px, 8vw, 200px)" }}>
         <div style={{ textAlign: "center", marginBottom: 44 }}>
           <h2 style={{ fontFamily: "var(--font-playfair), serif", fontSize: "clamp(28px, 4vw, 38px)", fontWeight: 800, color: "#fff", margin: "0 0 12px", letterSpacing: "-0.5px", lineHeight: 1.15, textTransform: "uppercase" }}>
@@ -1252,6 +1261,13 @@ export default function BMCPLanding() {
           )}
         </div>
       </section>
+      */}
+
+      {/* ===== VIDEO TESTIMONIALS ===== */}
+      <ReviewsSection />
+
+      {/* ===== INSTAGRAM WIDGET ===== */}
+      <InstagramWidget />
 
       {/* ===== 4. TESTIMONIALS — GOOGLE REVIEWS ===== */}
       <Sec bg="#F5F5F7">
