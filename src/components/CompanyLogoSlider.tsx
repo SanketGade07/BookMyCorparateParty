@@ -5,13 +5,14 @@ interface LogoItem {
   renderLogo: () => React.ReactNode;
 }
 
+/*
 const logoItems: LogoItem[] = [
   {
     name: "IBM",
     renderLogo: () => (
       <svg viewBox="0 0 100 35" className="company-logo-svg" fill="#0F62FE">
         <text x="10" y="26" fontFamily="'Arial Black', Impact, sans-serif" fontSize="24" fontWeight="900" letterSpacing="2px">IBM</text>
-        {/* Striped overlay effect */}
+        // Striped overlay effect
         <line x1="0" y1="5" x2="100" y2="5" stroke="#ffffff" strokeWidth="2" />
         <line x1="0" y1="10" x2="100" y2="10" stroke="#ffffff" strokeWidth="2" />
         <line x1="0" y1="15" x2="100" y2="15" stroke="#ffffff" strokeWidth="2" />
@@ -41,7 +42,7 @@ const logoItems: LogoItem[] = [
     name: "Maersk",
     renderLogo: () => (
       <svg viewBox="0 0 140 35" className="company-logo-svg">
-        {/* Maersk Star */}
+        // Maersk Star
         <rect x="12" y="8" width="18" height="18" fill="none" stroke="#40B4E5" strokeWidth="2.5" rx="2" />
         <path d="M21 12 L22.5 15.5 L26 15.5 L23 17.5 L24.5 21 L21 19 L17.5 21 L19 17.5 L16 15.5 L19.5 15.5 Z" fill="#40B4E5" />
         <text x="38" y="24" fill="#111111" fontFamily="'Arial Black', Impact, sans-serif" fontSize="16" fontWeight="900" letterSpacing="0.5px">MAERSK</text>
@@ -210,6 +211,148 @@ const logoItems: LogoItem[] = [
     )
   }
 ];
+*/
+
+const logoItems: LogoItem[] = [
+  {
+    name: "BNI",
+    renderLogo: () => (
+      <img src="/images/logos/new/BNI_logo.png" alt="BNI" className="company-logo-img" />
+    )
+  },
+  {
+    name: "CDSL",
+    renderLogo: () => (
+      <img src="/images/logos/new/CDSL Logo.png" alt="CDSL" className="company-logo-img" />
+    )
+  },
+  {
+    name: "IBM",
+    renderLogo: () => (
+      <img src="/images/logos/new/ibm-logo.png" alt="IBM" className="company-logo-img" />
+    )
+  },
+  {
+    name: "JSW",
+    renderLogo: () => (
+      <img src="/images/logos/new/jsw.png" alt="JSW" className="company-logo-img" />
+    )
+  },
+  {
+    name: "RXO",
+    renderLogo: () => (
+      <img src="/images/logos/new/RXO.svg" alt="RXO" className="company-logo-img" />
+    )
+  },
+  {
+    name: "Accenture",
+    renderLogo: () => (
+      <img src="/images/logos/new/Accenture_logo.svg" alt="Accenture" className="company-logo-img" />
+    )
+  },
+  {
+    name: "ArConnect",
+    renderLogo: () => (
+      <img src="/images/logos/arconnect.jpg" alt="ArConnect" className="company-logo-img" />
+    )
+  },
+  {
+    name: "Codvo.ai",
+    renderLogo: () => (
+      <img src="/images/logos/codvo.ai.jpg" alt="Codvo.ai" className="company-logo-img" />
+    )
+  },
+  {
+    name: "Concorde",
+    renderLogo: () => (
+      <img src="/images/logos/concorde.jpg" alt="Concorde" className="company-logo-img" />
+    )
+  },
+  {
+    name: "Guidepoint",
+    renderLogo: () => (
+      <img src="/images/logos/guidepoint.jpg" alt="Guidepoint" className="company-logo-img" />
+    )
+  },
+  {
+    name: "Hafele",
+    renderLogo: () => (
+      <img src="/images/logos/new/haefele_logo.png" alt="Hafele" className="company-logo-img" />
+    )
+  },
+  {
+    name: "Intuit",
+    renderLogo: () => (
+      <svg width="85" height="30" viewBox="0 0 260 53" fill="none" xmlns="http://www.w3.org/2000/svg" className="company-logo-svg">
+        <path d="M133.457 30.1055C133.457 42.7658 143.954 52.0264 157.29 52.0264C170.625 52.0264 181.134 42.7658 181.134 30.1055V1.01878H168.221V28.6059C168.221 35.4397 163.482 40.0414 157.255 40.0414C151.028 40.0414 146.289 35.4626 146.289 28.6059V1.01878H133.377L133.457 30.1055ZM215.635 12.6603H231.042V51.0648H243.954V12.6603H259.362V0.995884H215.635V12.6603ZM207.29 0.995884H194.378V51.0648H207.29V0.995884ZM81.2933 12.6603H96.7008V51.0648H109.613V12.6603H125.009V0.995884H81.2933V12.6603ZM13.5502 0.995884H0.638062V51.0648H13.5502V0.995884ZM74.4938 21.9095C74.4938 9.24913 63.9969 0 50.6498 0C37.3026 0 26.8058 9.24913 26.8058 21.9095V51.0648H39.7179V23.4777C39.7179 16.6439 44.457 12.0422 50.6841 12.0422C56.9112 12.0422 61.6503 16.621 61.6503 23.4777V51.0648H74.5624L74.4823 21.9095H74.4938Z" fill="#236CFF"></path>
+      </svg>
+    )
+  },
+  {
+    name: "Maersk",
+    renderLogo: () => (
+      <img src="/images/logos/maersk.jpg" alt="Maersk" className="company-logo-img" />
+    )
+  },
+  {
+    name: "Neo",
+    renderLogo: () => (
+      <svg viewBox="0 0 90 35" className="company-logo-svg">
+        <rect x="8" y="7" width="36" height="22" rx="6" fill="none" stroke="#6366F1" strokeWidth="2" />
+        <text x="15" y="22" fill="#6366F1" fontFamily="sans-serif" fontSize="12" fontWeight="800">neo</text>
+        <text x="50" y="23" fill="#111111" fontFamily="'DM Sans', sans-serif" fontSize="14" fontWeight="800">Do Good.</text>
+      </svg>
+    )
+  },
+  {
+    name: "Pramukh",
+    renderLogo: () => (
+      <img src="/images/logos/pramukh.jpg" alt="Pramukh" className="company-logo-img" />
+    )
+  },
+  {
+    name: "Seed Global Education",
+    renderLogo: () => (
+      <div className="seed-logo-wrapper">
+        <img src="/images/logos/new/seed_logo.png" alt="Seed Cap" className="seed-logo-cap" />
+        <span className="seed-logo-text">
+          <span className="seed-logo-seed">SEED</span>
+          <span className="seed-logo-global"> Global Education</span>
+        </span>
+      </div>
+    )
+  },
+  {
+    name: "Suryoday",
+    renderLogo: () => (
+      <img src="/images/logos/new/Suryodaylogo_1_1_a157d376fe.webp" alt="Suryoday" className="company-logo-img" />
+    )
+  },
+  {
+    name: "Synergy Group",
+    renderLogo: () => (
+      <img src="/images/logos/new/synergy-logo.webp" alt="Synergy Group" className="company-logo-img" />
+    )
+  },
+  {
+    name: "Unified",
+    renderLogo: () => (
+      <img src="/images/logos/unified.jpg" alt="Unified" className="company-logo-img" />
+    )
+  },
+  {
+    name: "WeWork",
+    renderLogo: () => (
+      <img src="/images/logos/wework.jpg" alt="WeWork" className="company-logo-img" />
+    )
+  },
+  {
+    name: "WTW",
+    renderLogo: () => (
+      <img src="/images/logos/wtw.jpg" alt="WTW" className="company-logo-img" />
+    )
+  }
+];
 
 const CompanyLogoSlider: React.FC = () => {
   // Duplicate logo list to make infinite continuous marquee
@@ -220,12 +363,10 @@ const CompanyLogoSlider: React.FC = () => {
       <style dangerouslySetInnerHTML={{__html: `
         .company-slider-container {
           background-color: #ffffff;
-          padding: 48px 0 40px 0;
+          padding: 36px 0 28px 0;
           overflow: hidden;
           width: 100%;
           box-sizing: border-box;
-          border-top: 1px solid #f3f4f6;
-          border-bottom: 1px solid #f3f4f6;
         }
         .company-slider-title {
           text-align: center;
@@ -267,30 +408,98 @@ const CompanyLogoSlider: React.FC = () => {
           display: flex;
           width: max-content;
           align-items: center;
-          gap: clamp(55px, 8vw, 85px);
           animation: companyMarquee 45s linear infinite;
+          will-change: transform;
         }
         .company-logo-item {
           flex-shrink: 0;
-          transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
           display: flex;
           align-items: center;
           justify-content: center;
+          padding: 12px 0;
+          margin-right: clamp(55px, 8vw, 85px);
         }
-        .company-logo-item:hover {
-          transform: scale(1.15);
-        }
-        .company-logo-svg {
+        .company-logo-svg,
+        .company-logo-img {
           height: clamp(34px, 5.5vw, 42px);
           width: auto;
           max-width: 190px;
+          object-fit: contain;
+        }
+        /* Fine-tune individual logo sizes for perfect visual balance */
+        .company-logo-ibm img, .company-logo-ibm svg {
+          transform: scale(1.65);
+        }
+        .company-logo-wtw img, .company-logo-wtw svg {
+          transform: scale(1.25);
+        }
+        .company-logo-bni img, .company-logo-bni svg {
+          transform: scale(0.85);
+        }
+        .company-logo-cdsl img, .company-logo-cdsl svg {
+          transform: scale(0.95);
+        }
+        .company-logo-rxo img, .company-logo-rxo svg {
+          transform: scale(0.9);
+        }
+        .company-logo-codvo-ai img, .company-logo-codvo-ai svg {
+          transform: scale(1.65);
+        }
+        .company-logo-concorde img, .company-logo-concorde svg {
+          transform: scale(0.85);
+        }
+        .company-logo-hafele img, .company-logo-hafele svg {
+          transform: scale(0.9);
+        }
+        .company-logo-intuit img, .company-logo-intuit svg {
+          transform: scale(1.25);
+        }
+        .company-logo-seed-global-education .seed-logo-wrapper {
+          transform: scale(1.05);
+        }
+        .seed-logo-wrapper {
+          display: flex;
+          align-items: center;
+          gap: clamp(6px, 1.2vw, 10px);
+          height: clamp(34px, 5.5vw, 42px);
+        }
+        .seed-logo-cap {
+          height: 100%;
+          width: auto;
+          object-fit: contain;
+        }
+        .seed-logo-text {
+          font-family: 'Inter', sans-serif;
+          font-size: clamp(14px, 2.2vw, 19.2px);
+          font-weight: 700;
+          white-space: nowrap;
+          line-height: 1;
+          letter-spacing: -0.2px;
+        }
+        .seed-logo-seed {
+          color: #0C8395;
+        }
+        .seed-logo-global {
+          color: #E98039;
+        }
+        .company-logo-synergy-group img, .company-logo-synergy-group svg {
+          transform: scale(1.35);
+        }
+        .company-logo-wework img, .company-logo-wework svg {
+          transform: scale(1.1);
+        }
+        .company-logo-arconnect img, .company-logo-arconnect svg {
+          transform: scale(1.1);
+        }
+        .company-logo-accenture img, .company-logo-accenture svg {
+          transform: scale(1.05);
         }
         @keyframes companyMarquee {
           0% {
-            transform: translateX(0);
+            transform: translate3d(0, 0, 0);
           }
           100% {
-            transform: translateX(-33.333333%);
+            transform: translate3d(-33.333333%, 0, 0);
           }
         }
       `}} />
@@ -298,7 +507,11 @@ const CompanyLogoSlider: React.FC = () => {
       <div className="company-slider-track-wrap">
         <div className="company-slider-track">
           {duplicatedLogos.map((logo, idx) => (
-            <div key={`${idx}-${logo.name}`} className="company-logo-item" title={logo.name}>
+            <div 
+              key={`${idx}-${logo.name}`} 
+              className={`company-logo-item company-logo-${logo.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`} 
+              title={logo.name}
+            >
               {logo.renderLogo()}
             </div>
           ))}
