@@ -235,10 +235,10 @@ export async function POST(req) {
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 620px; margin: 0 auto; border: 1px solid #eee; border-radius: 10px; overflow: hidden;">
         <div style="padding: 14px 32px; background: #F0FDF4; border-bottom: 1px solid #DCFCE7; color: #15803D; font-size: 15px; font-weight: bold; text-align: center;">
-          🎉 Congratulations on your new lead!
+          🎉 Congratulations on your new ${venueLabel} lead!
         </div>
         <div style="background: #80281F; padding: 24px 32px;">
-          <h2 style="color: #fff; margin: 0; font-size: 20px;">New ${venueLabel} Enquiry${statusSuffix} — BookMyCorporateParty [${subdomainSource}]</h2>
+          <h2 style="color: #fff; margin: 0; font-size: 20px;">🎉 Congratulations! New ${venueLabel} Enquiry${statusSuffix} — BookMyCorporateParty [${subdomainSource}]</h2>
           <p style="color: rgba(255,255,255,0.8); margin: 6px 0 0; font-size: 13px;">Received at ${indianTime} via ${subdomainSource}</p>
         </div>
         <div style="padding: 28px 32px; background: #fff;">
@@ -279,7 +279,7 @@ export async function POST(req) {
       await transporter.sendMail({
         from: `"BookMyCorporateParty Enquiry" <${process.env.NEXT_PUBLIC_EMAIL_USER}>`,
         to: process.env.NEXT_PUBLIC_EMAIL_RECEIVER,
-        subject: `🎉 New Lead: ${venueLabel} Enquiry${statusSuffix} from ${name} [${subdomainSource}]`,
+        subject: `🎉 Congratulations! New ${venueLabel} Enquiry${statusSuffix} from ${name} [${subdomainSource}]`,
         html: emailHtml,
         text: `[Source: ${subdomainSource}] New ${venueLabel} enquiry${statusSuffix} from ${name} (${phone}, ${email || 'no-email'}). Source: ${source || '—'}. ${textSummary}. User Location: ${userLocation || 'Unknown'}. IP: ${userIp || 'Unknown'}. Submitted: ${indianTime}`,
       });
