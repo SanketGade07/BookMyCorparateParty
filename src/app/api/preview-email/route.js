@@ -26,14 +26,14 @@ export async function GET() {
 
   const emailHtml = `
     <div style="font-family: Arial, sans-serif; max-width: 620px; margin: 0 auto; border: 1px solid #eee; border-radius: 10px; overflow: hidden;">
-      <div style="padding: 14px 32px; background: #F0FDF4; border-bottom: 1px solid #DCFCE7; color: #15803D; font-size: 15px; font-weight: bold; text-align: center;">
-        🎉 Congratulations on your new ${venueLabel} lead!
-      </div>
       <div style="background: #80281F; padding: 24px 32px;">
-        <h2 style="color: #fff; margin: 0; font-size: 20px;">🎉 Congratulations! New ${venueLabel} Enquiry${statusSuffix} — BookMyCorporateParty [${subdomainSource}]</h2>
+        <h2 style="color: #fff; margin: 0; font-size: 20px; font-weight: bold;">🎉 Congratulations on your new lead!</h2>
         <p style="color: rgba(255,255,255,0.8); margin: 6px 0 0; font-size: 13px;">Received at ${indianTime} via ${subdomainSource}</p>
       </div>
       <div style="padding: 28px 32px; background: #fff;">
+        <div style="margin-bottom: 20px; padding: 12px 16px; background: #F9FAFB; border-left: 4px solid #80281F; border-radius: 4px; font-size: 14px; font-weight: bold; color: #374151;">
+          New ${venueLabel} Enquiry${statusSuffix} — BookMyCorporateParty [${subdomainSource}]
+        </div>
         <h3 style="color: #80281F; margin: 0 0 16px; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Contact Details</h3>
         <p style="margin: 0 0 8px;"><strong>Name:</strong> ${name}</p>
         <p style="margin: 0 0 8px;"><strong>WhatsApp Number:</strong> ${phone}</p>
@@ -138,7 +138,7 @@ export async function GET() {
           <div class="console-title">📧 Email Preview & Test Console</div>
           <div class="info-row">
             <span class="info-label">Subject:</span>
-            <span class="info-val">🎉 Congratulations! New ${venueLabel} Enquiry${statusSuffix} from ${name} [${subdomainSource}]</span>
+            <span style="color: #111827; font-family: monospace;">🎉 Congratulations on your new lead! - ${name}</span>
           </div>
           <div class="info-row">
             <span class="info-label">Sender:</span>
