@@ -234,6 +234,9 @@ export async function POST(req) {
 
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 620px; margin: 0 auto; border: 1px solid #eee; border-radius: 10px; overflow: hidden;">
+        <div style="padding: 14px 32px; background: #F0FDF4; border-bottom: 1px solid #DCFCE7; color: #15803D; font-size: 15px; font-weight: bold; text-align: center;">
+          🎉 Congratulations on your new lead!
+        </div>
         <div style="background: #80281F; padding: 24px 32px;">
           <h2 style="color: #fff; margin: 0; font-size: 20px;">New ${venueLabel} Enquiry${statusSuffix} — BookMyCorporateParty [${subdomainSource}]</h2>
           <p style="color: rgba(255,255,255,0.8); margin: 6px 0 0; font-size: 13px;">Received at ${indianTime} via ${subdomainSource}</p>
@@ -272,13 +275,18 @@ export async function POST(req) {
     `;
 
     const textSummary = venueDetailsLines(payload).join(' | ');
-    await transporter.sendMail({
-      from: `"BookMyCorporateParty Enquiry" <${process.env.NEXT_PUBLIC_EMAIL_USER}>`,
-      to: process.env.NEXT_PUBLIC_EMAIL_RECEIVER,
-      subject: `[${subdomainSource}] New ${venueLabel} Enquiry${statusSuffix} from ${name}`,
-      html: emailHtml,
-      text: `[Source: ${subdomainSource}] New ${venueLabel} enquiry${statusSuffix} from ${name} (${phone}, ${email || 'no-email'}). Source: ${source || '—'}. ${textSummary}. User Location: ${userLocation || 'Unknown'}. IP: ${userIp || 'Unknown'}. Submitted: ${indianTime}`,
-    });
+    try {
+      await transporter.sendMail({
+        from: `"BookMyCorporateParty Enquiry" <${process.env.NEXT_PUBLIC_EMAIL_USER}>`,
+        to: process.env.NEXT_PUBLIC_EMAIL_RECEIVER,
+        subject: `🎉 New Lead: ${venueLabel} Enquiry${statusSuffix} from ${name} [${subdomainSource}]`,
+        html: emailHtml,
+        text: `[Source: ${subdomainSource}] New ${venueLabel} enquiry${statusSuffix} from ${name} (${phone}, ${email || 'no-email'}). Source: ${source || '—'}. ${textSummary}. User Location: ${userLocation || 'Unknown'}. IP: ${userIp || 'Unknown'}. Submitted: ${indianTime}`,
+      });
+      console.log('[Submit Form API] ✅ Lead notification email sent successfully.');
+    } catch (mailError) {
+      console.warn('[Submit Form API] ⚠️ Email transport failed (SMTP keys likely missing in .env):', mailError.message);
+    }
 
     // 2. Push to Odoo CRM (fire-and-forget)
     pushToOdoo(payload, subdomainSource);

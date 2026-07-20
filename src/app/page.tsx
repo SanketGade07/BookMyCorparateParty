@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 import useGeoLocation from "../hooks/useGeoLocation";
 import dynamic from "next/dynamic";
 
-const ReviewsSection = dynamic(() => import("../components/ReviewsSection"), { ssr: false });
+// const ReviewsSection = dynamic(() => import("../components/ReviewsSection"), { ssr: false });
+const EventsSection = dynamic(() => import("../components/EventsSection"), { ssr: false });
 const InstagramWidget = dynamic(() => import("../components/InstagramWidget"), { ssr: false });
 const CompanyLogoSlider = dynamic(() => import("../components/CompanyLogoSlider"), { ssr: false });
 
@@ -126,6 +127,13 @@ const dayFromDate = (iso: string): string => {
   return d.toLocaleDateString('en-US', { weekday: 'long' });
 };
 
+const formatDate = (dateStr: string) => {
+  if (!dateStr) return '';
+  const [y, m, d] = dateStr.split('-');
+  if (!y || !m || !d) return dateStr;
+  return `${d}-${m}-${y}`;
+};
+
 export default function BMCPLanding() {
   const router = useRouter();
 
@@ -153,6 +161,7 @@ export default function BMCPLanding() {
     checkInDate: '',
     checkOutDate: '',
     totalPax: '',
+    totalKids: '',
     food: '',
     pricingAccepted: false,
     // Lounge & Banquet shared
@@ -348,7 +357,7 @@ export default function BMCPLanding() {
 
   const handleStep1 = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isStep1Valid()) return;
+    if (!isStep2Valid()) return;
 
     isSubmittedRef.current = false;
     partialSentRef.current = false;
@@ -365,7 +374,10 @@ export default function BMCPLanding() {
 
   const isStep1Valid = () => {
     const f = formData;
-    return !!(f.formType && f.name && f.whatsappNumber && f.email && f.source && isValidPhone(f.whatsappNumber));
+    const contactValid = !!(f.formType && f.name && f.whatsappNumber && f.email && f.source && isValidPhone(f.whatsappNumber));
+    if (!contactValid) return false;
+    if (f.formType === 'villa' && !f.pricingAccepted) return false;
+    return true;
   };
 
   const isStep2Valid = () => {
@@ -374,7 +386,6 @@ export default function BMCPLanding() {
     if (f.formType === 'villa') {
       if (!f.checkInDate || !f.checkOutDate || !f.totalPax || !f.food) return false;
       if (parseInt(f.totalPax || '0', 10) < 20) return false;
-      if (!f.pricingAccepted) return false;
       return true;
     }
     if (f.formType === 'lounge' || f.formType === 'nightclub') {
@@ -390,7 +401,7 @@ export default function BMCPLanding() {
 
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
-    if (!isStep2Valid()) return;
+    if (!isStep1Valid()) return;
 
     isSubmittedRef.current = true;
     if (timerRef.current) {
@@ -448,7 +459,7 @@ export default function BMCPLanding() {
       if (res.ok && data.success) {
         setFormData({
           formType: '' as FormType,
-          checkInDate: '', checkOutDate: '', totalPax: '', food: '', pricingAccepted: false,
+          checkInDate: '', checkOutDate: '', totalPax: '', totalKids: '', food: '', pricingAccepted: false,
           date: '', noOfPeople: '', location: '',
           budgetOnlyFood: '', budgetWithDrinks: '', typeOfMeal: '',
           foodType: '', budget: '',
@@ -482,6 +493,35 @@ export default function BMCPLanding() {
     <div style={{ fontFamily: "var(--font-dm-sans), sans-serif", color: D, overflowX: "hidden" }}>
       <style>{`
         .hamburger-btn { display: none; }
+        
+        /* Smooth reveal animation for progressive form disclosure */
+        @keyframes revealForm {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .reveal-section {
+          animation: revealForm 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        
+        /* Make entire date inputs clickable natively, and style custom calendar icon */
+        input[type="date"] {
+          position: relative !important;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23111827' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E") !important;
+          background-repeat: no-repeat !important;
+          background-position: right 12px center !important;
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator {
+          position: absolute !important;
+          top: 0 !important;
+          left: 0 !important;
+          right: 0 !important;
+          bottom: 0 !important;
+          width: 100% !important;
+          height: 100% !important;
+          opacity: 0 !important;
+          cursor: pointer !important;
+          z-index: 2 !important;
+        }
         @media (max-width: 768px) {
           .nav-links, .nav-actions { display: none !important; }
           .hamburger-btn { display: flex !important; }
@@ -880,7 +920,7 @@ export default function BMCPLanding() {
                  {[1, 2].map(s => (
                    <div key={s} style={{ display: "flex", alignItems: "center", gap: 6 }}>
                      <div style={{ width: 22, height: 22, borderRadius: "50%", background: formStep >= s ? R : B, color: formStep >= s ? "#fff" : G, fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.3s" }}>{s}</div>
-                     <span style={{ fontSize: 11, fontWeight: 600, color: formStep >= s ? D : G }}>{s === 1 ? "Your Contact" : "Venue Details"}</span>
+                     <span style={{ fontSize: 11, fontWeight: 600, color: formStep >= s ? D : G }}>{s === 1 ? "Venue Details" : "Your Contact"}</span>
                      {s === 1 && <div style={{ width: 28, height: 1, background: formStep === 2 ? R : B, marginLeft: 2, transition: "background 0.3s" }} />}
                    </div>
                  ))}
@@ -898,15 +938,15 @@ export default function BMCPLanding() {
               </div>
 
             ) : formStep === 1 ? (
-              /* ── STEP 1: Contact details + select dropdown ── */
-              <form onSubmit={handleStep1}>
+              /* ── STEP 1: Venue-specific details ── */
+              <form key="step1-form" onSubmit={handleStep1}>
                 <h3 style={{ margin: "0 0 2px", fontSize: 17, fontWeight: 700, color: D }}>Get Venue Options Free</h3>
                 <p style={{ margin: "0 0 14px", fontSize: 12, color: G }}>Free for HR & Admin teams. Options within 30 minutes.</p>
 
                 {/* Venue type */}
                 <div style={{ marginBottom: 10 }}>
                   <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>What u want to book? *</label>
-                  <select required value={formData.formType} onChange={e => setFormData({ ...formData, formType: e.target.value as FormType })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif", background: "#fff", color: formData.formType ? D : G, appearance: "none", backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B}>
+                  <select required value={formData.formType} onChange={e => setFormData({ ...formData, formType: e.target.value as FormType })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif", background: "#fff", color: formData.formType ? D : G, appearance: "none", backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center", cursor: "pointer" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B}>
                     <option value="" disabled>Select venue type</option>
                     <option value="villa">Villa / Resort</option>
                     <option value="lounge">Lounge</option>
@@ -916,215 +956,305 @@ export default function BMCPLanding() {
                   </select>
                 </div>
 
-                <div style={{ marginBottom: 10 }}>
-                  <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Your Name *</label>
-                  <input required type="text" placeholder="e.g. Priya Sharma" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                </div>
+                {formData.formType !== "" && (
+                  <div className="reveal-section">
+                    {/* ──── VILLA / RESORT ──── */}
+                    {formData.formType === 'villa' && (
+                      <>
+                        <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+                          <div style={{ flex: 1 }}>
+                            <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Check-In *</label>
+                            <input required type="date" value={formData.checkInDate} onChange={e => setFormData({ ...formData, checkInDate: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif", color: formData.checkInDate ? D : "#888", cursor: "pointer" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Check-Out *</label>
+                            <input required type="date" value={formData.checkOutDate} onChange={e => setFormData({ ...formData, checkOutDate: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif", color: formData.checkOutDate ? D : "#888", cursor: "pointer" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
+                          </div>
+                        </div>
 
-                <div style={{ marginBottom: 10 }}>
-                  <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>WhatsApp Number *</label>
-                  <div style={{ display: "flex", gap: 6 }}>
-                    <input required type="tel" placeholder="e.g. 9876543210" value={formData.whatsappNumber} onChange={e => setFormData({ ...formData, whatsappNumber: e.target.value })} style={{ flex: 1, padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                    <button type="button" onClick={handleSendOtp} disabled={!isValidPhone(formData.whatsappNumber) || otpSent} style={{ background: (isValidPhone(formData.whatsappNumber) && !otpSent) ? R : "#aaa", color: "#fff", border: "none", borderRadius: 7, padding: "0 12px", fontSize: 11, fontWeight: 700, cursor: (isValidPhone(formData.whatsappNumber) && !otpSent) ? "pointer" : "not-allowed", transition: "all 0.2s" }}>
-                      {otpSent ? "OTP Sent" : "Send OTP"}
-                    </button>
+                        <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+                          <div style={{ flex: 1 }}>
+                            <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Total Pax *</label>
+                            <input required type="number" min="20" placeholder="e.g. 8" value={formData.totalPax} onChange={e => setFormData({ ...formData, totalPax: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
+                            {formData.totalPax && parseInt(formData.totalPax, 10) < 20 && (
+                              <span style={{ display: "block", color: "#DC2626", fontSize: 10, fontWeight: 600, marginTop: 4 }}>⚠️ Minimum 20 pax required</span>
+                            )}
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Total Kids *</label>
+                            <input type="number" min="0" placeholder="0" value={formData.totalKids} onChange={e => setFormData({ ...formData, totalKids: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
+                          </div>
+                        </div>
+
+                        <div style={{ marginBottom: 10 }}>
+                          <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 6 }}>Food *</label>
+                          <div style={{ display: "flex", gap: 6 }}>
+                            {['Veg', 'Non-Veg', 'Pure Veg'].map(opt => {
+                              const sel = formData.food === opt;
+                              return (
+                                <label key={opt} style={{ flex: 1, textAlign: "center", padding: "8px 4px", border: `1px solid ${sel ? R : B}`, borderRadius: 7, fontSize: 12, fontWeight: 600, color: sel ? R : D, background: sel ? L : "#fff", cursor: "pointer" }}>
+                                  <input type="radio" name="food" value={opt} checked={sel} onChange={e => setFormData({ ...formData, food: e.target.value })} style={{ display: "none" }} />
+                                  {opt}
+                                </label>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </>
+                    )}
+
+                    {/* ──── LOUNGE / NIGHT CLUB ──── */}
+                    {(formData.formType === 'lounge' || formData.formType === 'nightclub') && (
+                      <>
+                        <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+                          <div style={{ flex: 1 }}>
+                            <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Date *</label>
+                            <input required type="date" value={formData.date} onChange={e => setFormData({ ...formData, date: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif", color: formData.date ? D : "#888", cursor: "pointer" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Day</label>
+                            <input readOnly value={dayFromDate(formData.date)} placeholder="—" style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif", background: "#F9FAFB", color: G }} />
+                          </div>
+                        </div>
+
+                        <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+                          <div style={{ flex: 1 }}>
+                            <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>No. of People (Min 20) *</label>
+                            <input required type="number" min="20" placeholder="e.g. 25 (Min 20)" value={formData.noOfPeople} onChange={e => setFormData({ ...formData, noOfPeople: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
+                            {formData.noOfPeople && parseInt(formData.noOfPeople, 10) < 20 && (
+                              <span style={{ display: "block", color: "#DC2626", fontSize: 10, fontWeight: 600, marginTop: 4 }}>⚠️ Minimum 20 pax required</span>
+                            )}
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Location *</label>
+                            <input required type="text" placeholder="e.g. Andheri West" value={formData.location} onChange={e => setFormData({ ...formData, location: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
+                          </div>
+                        </div>
+
+                        <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+                          <div style={{ flex: 1 }}>
+                            <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Budget (Food) ₹ *</label>
+                            <input required type="number" min="0" placeholder="1500–1800" value={formData.budgetOnlyFood} onChange={e => setFormData({ ...formData, budgetOnlyFood: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Budget (Drinks) ₹ *</label>
+                            <input required type="number" min="0" placeholder="2500+" value={formData.budgetWithDrinks} onChange={e => setFormData({ ...formData, budgetWithDrinks: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
+                          </div>
+                        </div>
+
+                        <div style={{ marginBottom: 10 }}>
+                          <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 6 }}>Type of Meal *</label>
+                          <div style={{ display: "flex", gap: 6 }}>
+                            {['Lunch', 'Dinner'].map(opt => {
+                              const sel = formData.typeOfMeal === opt;
+                              return (
+                                <label key={opt} style={{ flex: 1, textAlign: "center", padding: "8px 4px", border: `1px solid ${sel ? R : B}`, borderRadius: 7, fontSize: 12, fontWeight: 600, color: sel ? R : D, background: sel ? L : "#fff", cursor: "pointer" }}>
+                                  <input type="radio" name="meal" value={opt} checked={sel} onChange={e => setFormData({ ...formData, typeOfMeal: e.target.value })} style={{ display: "none" }} />
+                                  {opt}
+                                </label>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </>
+                    )}
+
+                    {/* ──── BANQUET / CATERING ──── */}
+                    {(formData.formType === 'banquet' || formData.formType === 'catering') && (
+                      <>
+                        <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+                          <div style={{ flex: 1 }}>
+                            <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Date *</label>
+                            <input required type="date" value={formData.date} onChange={e => setFormData({ ...formData, date: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif", color: formData.date ? D : "#888", cursor: "pointer" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Day</label>
+                            <input readOnly value={dayFromDate(formData.date)} placeholder="—" style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif", background: "#F9FAFB", color: G }} />
+                          </div>
+                        </div>
+
+                        <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+                          <div style={{ flex: 1 }}>
+                            <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>No. of People (Min 20) *</label>
+                            <input required type="number" min="20" placeholder="e.g. 100 (Min 20)" value={formData.noOfPeople} onChange={e => setFormData({ ...formData, noOfPeople: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
+                            {formData.noOfPeople && parseInt(formData.noOfPeople, 10) < 20 && (
+                              <span style={{ display: "block", color: "#DC2626", fontSize: 10, fontWeight: 600, marginTop: 4 }}>⚠️ Minimum 20 pax required</span>
+                            )}
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Location *</label>
+                            <input required type="text" placeholder="e.g. Andheri West" value={formData.location} onChange={e => setFormData({ ...formData, location: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
+                          </div>
+                        </div>
+
+                        <div style={{ marginBottom: 10 }}>
+                          <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 6 }}>Food Type *</label>
+                          <div style={{ display: "flex", gap: 6 }}>
+                            {['Veg', 'Non-Veg', 'Pure Veg'].map(opt => {
+                              const sel = formData.foodType === opt;
+                              return (
+                                <label key={opt} style={{ flex: 1, textAlign: "center", padding: "8px 4px", border: `1px solid ${sel ? R : B}`, borderRadius: 7, fontSize: 12, fontWeight: 600, color: sel ? R : D, background: sel ? L : "#fff", cursor: "pointer" }}>
+                                  <input type="radio" name="foodType" value={opt} checked={sel} onChange={e => setFormData({ ...formData, foodType: e.target.value })} style={{ display: "none" }} />
+                                  {opt}
+                                </label>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        <div style={{ marginBottom: 10 }}>
+                          <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Budget ₹ *</label>
+                          <input required type="number" min="0" placeholder="e.g. 80000" value={formData.budget} onChange={e => setFormData({ ...formData, budget: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
+                        </div>
+                      </>
+                    )}
                   </div>
-                  {otpSent && (
-                    <div style={{ marginTop: 8, display: "flex", gap: 6, alignItems: "center" }}>
-                      <input type="text" maxLength={6} placeholder="Enter OTP (Optional)" value={otpCode} onChange={e => setOtpCode(e.target.value)} style={{ width: 120, padding: "8px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 12, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} />
-                      <button type="button" onClick={handleVerifyOtp} disabled={otpVerified || !otpCode} style={{ background: (otpVerified || !otpCode) ? "#aaa" : "#16A34A", color: "#fff", border: "none", borderRadius: 7, padding: "8px 14px", fontSize: 11, fontWeight: 700, cursor: (otpVerified || !otpCode) ? "default" : "pointer" }}>
-                        {otpVerified ? "✓ Verified" : "Verify"}
-                      </button>
-                      <button type="button" onClick={() => setOtpSent(false)} style={{ background: "none", border: "none", color: R, fontSize: 11, fontWeight: 600, cursor: "pointer", padding: 0 }}>Resend</button>
-                    </div>
-                  )}
-                  {otpVerified && (
-                    <span style={{ display: "block", color: "#16A34A", fontSize: 10, fontWeight: 600, marginTop: 4 }}>✓ OTP verified successfully (Mock)</span>
-                  )}
-                </div>
+                )}
 
-                <div style={{ marginBottom: 10 }}>
-                  <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Email *</label>
-                  <input required type="email" placeholder="you@company.com" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                </div>
-
-                <div style={{ marginBottom: 12 }}>
-                  <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>How did you hear about us? *</label>
-                  <select required value={formData.source} onChange={e => setFormData({ ...formData, source: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif", background: "#fff", color: formData.source ? D : G, appearance: "none", backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B}>
-                    <option value="" disabled>Select source</option>
-                    {SOURCE_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
-                  </select>
-                </div>
-
-                <button type="submit" disabled={!isStep1Valid()} style={{ width: "100%", padding: "11px 0", background: isStep1Valid() ? R : "#aaa", color: "#fff", border: "none", borderRadius: 8, fontSize: 14, fontWeight: 700, cursor: isStep1Valid() ? "pointer" : "not-allowed", fontFamily: "var(--font-dm-sans), sans-serif", boxShadow: "0 4px 14px rgba(192,57,43,0.2)", marginTop: 4 }}>
+                <button type="submit" disabled={!isStep2Valid()} style={{ width: "100%", padding: "11px 0", background: isStep2Valid() ? R : "#F3F4F6", color: isStep2Valid() ? "#fff" : "#9CA3AF", border: isStep2Valid() ? "none" : "1px solid #E5E7EB", borderRadius: 8, fontSize: 14, fontWeight: 700, cursor: isStep2Valid() ? "pointer" : "not-allowed", fontFamily: "var(--font-dm-sans), sans-serif", boxShadow: isStep2Valid() ? "0 4px 14px rgba(192,57,43,0.2)" : "none", marginTop: 4 }}>
                   NEXT →
                 </button>
                 <p style={{ fontSize: 10, color: "#999", textAlign: "center", margin: "6px 0 0" }}>Free service · No spam · No obligations</p>
               </form>
 
             ) : (
-              /* ── STEP 2: Venue-specific details (+ pricing tick for Villa) ── */
-              <form onSubmit={handleSubmit}>
+              /* ── STEP 2: Contact details ── */
+              <form key="step2-form" onSubmit={handleSubmit}>
                 <h3 style={{ margin: "0 0 2px", fontSize: 17, fontWeight: 700, color: D }}>Almost there!</h3>
                 <p style={{ margin: "0 0 4px", fontSize: 12, color: G }}>Please share the details of your booking.</p>
 
-                {/* Summary pill */}
+                {/* Summary pill showing venue details */}
                 <div style={{ background: L, border: `1px solid ${B}`, borderRadius: 8, padding: "8px 12px", marginBottom: 14, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <div style={{ display: "flex", flexDirection: "column" }}>
-                    <span style={{ fontSize: 12, color: D, fontWeight: 700 }}>👤 {formData.name} ({formData.whatsappNumber})</span>
-                    <span style={{ fontSize: 10, color: G }}>📍 {formData.formType ? VENUE_LABEL[formData.formType] : ''}</span>
+                    <span style={{ fontSize: 12, color: D, fontWeight: 700 }}>📍 {formData.formType ? VENUE_LABEL[formData.formType] : ''}</span>
+                    <span style={{ fontSize: 10, color: G }}>
+                      {formData.formType === 'villa' 
+                        ? `${formData.checkInDate ? formatDate(formData.checkInDate) : ''} to ${formData.checkOutDate ? formatDate(formData.checkOutDate) : ''} · ${formData.totalPax || 0} Pax`
+                        : `${formData.date ? formatDate(formData.date) : ''} · ${formData.noOfPeople || 0} Pax`
+                      }
+                    </span>
                   </div>
-                  <button type="button" onClick={() => setFormStep(1)} style={{ background: "none", border: "none", color: R, fontSize: 11, fontWeight: 700, cursor: "pointer", padding: 0 }}>Edit</button>
+                  <button 
+                    type="button" 
+                    onClick={(e) => { 
+                      e.preventDefault(); 
+                      e.stopPropagation(); 
+                      setFormStep(1); 
+                    }} 
+                    style={{ 
+                      background: "none", 
+                      border: "none", 
+                      color: R, 
+                      fontSize: 11, 
+                      fontWeight: 700, 
+                      cursor: "pointer", 
+                      padding: "6px 10px", 
+                      position: "relative", 
+                      zIndex: 10 
+                    }}
+                  >
+                    Edit
+                  </button>
                 </div>
 
-                {/* ──── VILLA / RESORT ──── */}
-                {formData.formType === 'villa' && (
-                  <>
-                    <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-                      <div style={{ flex: 1 }}>
-                        <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Check-In *</label>
-                        <input required type="date" value={formData.checkInDate} onChange={e => setFormData({ ...formData, checkInDate: e.target.value })} onClick={e => (e.target as HTMLInputElement).showPicker?.()} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif", color: formData.checkInDate ? D : "#888", cursor: "pointer" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Check-Out *</label>
-                        <input required type="date" value={formData.checkOutDate} onChange={e => setFormData({ ...formData, checkOutDate: e.target.value })} onClick={e => (e.target as HTMLInputElement).showPicker?.()} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif", color: formData.checkOutDate ? D : "#888", cursor: "pointer" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                      </div>
+                <div style={{ marginBottom: 10 }}>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Your Name *</label>
+                  <input required type="text" placeholder="e.g. Priya Sharma" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
+                </div>
+
+                <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+                  {/* Email (First) */}
+                  <div style={{ flex: 1 }}>
+                    <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Email *</label>
+                    <input required type="email" placeholder="you@company.com" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
+                  </div>
+
+                  {/* WhatsApp Number (Second) */}
+                  <div style={{ flex: 1 }}>
+                    <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>WhatsApp Number *</label>
+                    <div style={{ display: "flex", gap: 6 }}>
+                      <input required type="tel" placeholder="e.g. 9876543210" value={formData.whatsappNumber} onChange={e => setFormData({ ...formData, whatsappNumber: e.target.value })} style={{ flex: 1, padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
+                      <button type="button" onClick={handleSendOtp} disabled={!isValidPhone(formData.whatsappNumber) || otpSent} style={{ background: (isValidPhone(formData.whatsappNumber) && !otpSent) ? R : "#F3F4F6", color: (isValidPhone(formData.whatsappNumber) && !otpSent) ? "#fff" : "#9CA3AF", border: `1px solid ${(isValidPhone(formData.whatsappNumber) && !otpSent) ? R : "#E5E7EB"}`, borderRadius: 7, padding: "0 12px", fontSize: 11, fontWeight: 700, cursor: (isValidPhone(formData.whatsappNumber) && !otpSent) ? "pointer" : "not-allowed", transition: "all 0.2s" }}>
+                        {otpSent ? "Sent" : "OTP"}
+                      </button>
                     </div>
 
-                    <div style={{ marginBottom: 10 }}>
-                      <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Total Pax (Min 20) *</label>
-                      <input required type="number" min="20" placeholder="e.g. 25 (Min 20)" value={formData.totalPax} onChange={e => setFormData({ ...formData, totalPax: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                      {formData.totalPax && parseInt(formData.totalPax, 10) < 20 && (
-                        <span style={{ display: "block", color: "#DC2626", fontSize: 10, fontWeight: 600, marginTop: 4 }}>⚠️ Minimum 20 pax required</span>
-                      )}
-                    </div>
+                    {/* OTP controls inside WhatsApp column */}
+                    {otpSent && (
+                      <div style={{ marginTop: 8, display: "flex", gap: 6, alignItems: "center" }}>
+                        <input 
+                          type="text" 
+                          maxLength={6} 
+                          placeholder="Enter OTP (Optional)" 
+                          value={otpCode} 
+                          onChange={e => setOtpCode(e.target.value)} 
+                          style={{ 
+                            flex: 1, 
+                            padding: "8px 10px", 
+                            border: `1px solid ${B}`, 
+                            borderRadius: 7, 
+                            fontSize: 12, 
+                            outline: "none", 
+                            boxSizing: "border-box", 
+                            fontFamily: "var(--font-dm-sans), sans-serif" 
+                          }} 
+                          onFocus={e => e.target.style.borderColor = R} 
+                          onBlur={e => e.target.style.borderColor = B}
+                        />
+                        <button 
+                          type="button" 
+                          onClick={handleVerifyOtp} 
+                          disabled={otpVerified || !otpCode} 
+                          style={{ 
+                            background: (otpVerified || !otpCode) ? "#F3F4F6" : "#16A34A", 
+                            color: (otpVerified || !otpCode) ? "#9CA3AF" : "#fff", 
+                            border: `1px solid ${(otpVerified || !otpCode) ? "#E5E7EB" : "#16A34A"}`, 
+                            borderRadius: 7, 
+                            padding: "8px 12px", 
+                            fontSize: 11, 
+                            fontWeight: 700, 
+                            cursor: (otpVerified || !otpCode) ? "default" : "pointer",
+                            transition: "all 0.2s"
+                          }}
+                        >
+                          {otpVerified ? "✓" : "Verify"}
+                        </button>
+                        <button 
+                          type="button" 
+                          onClick={() => setOtpSent(false)} 
+                          style={{ 
+                            background: "none", 
+                            border: "none", 
+                            color: R, 
+                            fontSize: 10, 
+                            fontWeight: 600, 
+                            cursor: "pointer", 
+                            padding: 0,
+                            textDecoration: "underline",
+                            whiteSpace: "nowrap"
+                          }}
+                        >
+                          Resend
+                        </button>
+                      </div>
+                    )}
+                    {otpVerified && (
+                      <span style={{ display: "block", color: "#16A34A", fontSize: 10, fontWeight: 600, marginTop: 4 }}>✓ Verified</span>
+                    )}
+                  </div>
+                </div>
 
-                    <div style={{ marginBottom: 10 }}>
-                      <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 6 }}>Food *</label>
-                      <div style={{ display: "flex", gap: 6 }}>
-                        {['Pure Veg', 'Veg / Non-Veg'].map(opt => {
-                          const sel = formData.food === opt;
-                          return (
-                            <label key={opt} style={{ flex: 1, textAlign: "center", padding: "8px 4px", border: `1px solid ${sel ? R : B}`, borderRadius: 7, fontSize: 12, fontWeight: 600, color: sel ? R : D, background: sel ? L : "#fff", cursor: "pointer" }}>
-                              <input type="radio" name="food" value={opt} checked={sel} onChange={e => setFormData({ ...formData, food: e.target.value })} style={{ display: "none" }} />
-                              {opt}
-                            </label>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {/* ──── LOUNGE / NIGHT CLUB ──── */}
-                {(formData.formType === 'lounge' || formData.formType === 'nightclub') && (
-                  <>
-                    <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-                      <div style={{ flex: 1 }}>
-                        <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Date *</label>
-                        <input required type="date" value={formData.date} onChange={e => setFormData({ ...formData, date: e.target.value })} onClick={e => (e.target as HTMLInputElement).showPicker?.()} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif", color: formData.date ? D : "#888", cursor: "pointer" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Day</label>
-                        <input readOnly value={dayFromDate(formData.date)} placeholder="—" style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif", background: "#F9FAFB", color: G }} />
-                      </div>
-                    </div>
-
-                    <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-                      <div style={{ flex: 1 }}>
-                        <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>No. of People (Min 20) *</label>
-                        <input required type="number" min="20" placeholder="e.g. 25 (Min 20)" value={formData.noOfPeople} onChange={e => setFormData({ ...formData, noOfPeople: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                        {formData.noOfPeople && parseInt(formData.noOfPeople, 10) < 20 && (
-                          <span style={{ display: "block", color: "#DC2626", fontSize: 10, fontWeight: 600, marginTop: 4 }}>⚠️ Minimum 20 pax required</span>
-                        )}
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Location *</label>
-                        <input required type="text" placeholder="e.g. Andheri West" value={formData.location} onChange={e => setFormData({ ...formData, location: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                      </div>
-                    </div>
-
-                    <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-                      <div style={{ flex: 1 }}>
-                        <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Budget (Food) ₹ *</label>
-                        <input required type="number" min="0" placeholder="1500–1800" value={formData.budgetOnlyFood} onChange={e => setFormData({ ...formData, budgetOnlyFood: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Budget (Drinks) ₹ *</label>
-                        <input required type="number" min="0" placeholder="2500+" value={formData.budgetWithDrinks} onChange={e => setFormData({ ...formData, budgetWithDrinks: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                      </div>
-                    </div>
-
-                    <div style={{ marginBottom: 10 }}>
-                      <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 6 }}>Type of Meal *</label>
-                      <div style={{ display: "flex", gap: 6 }}>
-                        {['Lunch', 'Dinner'].map(opt => {
-                          const sel = formData.typeOfMeal === opt;
-                          return (
-                            <label key={opt} style={{ flex: 1, textAlign: "center", padding: "8px 4px", border: `1px solid ${sel ? R : B}`, borderRadius: 7, fontSize: 12, fontWeight: 600, color: sel ? R : D, background: sel ? L : "#fff", cursor: "pointer" }}>
-                              <input type="radio" name="meal" value={opt} checked={sel} onChange={e => setFormData({ ...formData, typeOfMeal: e.target.value })} style={{ display: "none" }} />
-                              {opt}
-                            </label>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {/* ──── BANQUET / CATERING ──── */}
-                {(formData.formType === 'banquet' || formData.formType === 'catering') && (
-                  <>
-                    <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-                      <div style={{ flex: 1 }}>
-                        <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Date *</label>
-                        <input required type="date" value={formData.date} onChange={e => setFormData({ ...formData, date: e.target.value })} onClick={e => (e.target as HTMLInputElement).showPicker?.()} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif", color: formData.date ? D : "#888", cursor: "pointer" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Day</label>
-                        <input readOnly value={dayFromDate(formData.date)} placeholder="—" style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif", background: "#F9FAFB", color: G }} />
-                      </div>
-                    </div>
-
-                    <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-                      <div style={{ flex: 1 }}>
-                        <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>No. of People (Min 20) *</label>
-                        <input required type="number" min="20" placeholder="e.g. 100 (Min 20)" value={formData.noOfPeople} onChange={e => setFormData({ ...formData, noOfPeople: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                        {formData.noOfPeople && parseInt(formData.noOfPeople, 10) < 20 && (
-                          <span style={{ display: "block", color: "#DC2626", fontSize: 10, fontWeight: 600, marginTop: 4 }}>⚠️ Minimum 20 pax required</span>
-                        )}
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Location *</label>
-                        <input required type="text" placeholder="e.g. Andheri West" value={formData.location} onChange={e => setFormData({ ...formData, location: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                      </div>
-                    </div>
-
-                    <div style={{ marginBottom: 10 }}>
-                      <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 6 }}>Food Type *</label>
-                      <div style={{ display: "flex", gap: 6 }}>
-                        {['Pure Veg', 'Veg / Non-Veg'].map(opt => {
-                          const sel = formData.foodType === opt;
-                          return (
-                            <label key={opt} style={{ flex: 1, textAlign: "center", padding: "8px 4px", border: `1px solid ${sel ? R : B}`, borderRadius: 7, fontSize: 12, fontWeight: 600, color: sel ? R : D, background: sel ? L : "#fff", cursor: "pointer" }}>
-                              <input type="radio" name="foodType" value={opt} checked={sel} onChange={e => setFormData({ ...formData, foodType: e.target.value })} style={{ display: "none" }} />
-                              {opt}
-                            </label>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    <div style={{ marginBottom: 10 }}>
-                      <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Budget ₹ *</label>
-                      <input required type="number" min="0" placeholder="e.g. 80000" value={formData.budget} onChange={e => setFormData({ ...formData, budget: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                    </div>
-                  </>
-                )}
+                <div style={{ marginBottom: 12 }}>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>How did you hear about us? *</label>
+                  <select required value={formData.source} onChange={e => setFormData({ ...formData, source: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif", background: "#fff", color: formData.source ? D : G, appearance: "none", backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center", cursor: "pointer" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B}>
+                    <option value="" disabled>Select source</option>
+                    {SOURCE_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
 
                 {formData.formType === 'villa' && (
                   <label style={{ display: "flex", gap: 10, alignItems: "flex-start", fontSize: 12, color: D, marginBottom: 12, cursor: "pointer", background: L, border: `1px solid ${B}`, borderRadius: 8, padding: "10px 12px" }}>
-                    <input type="checkbox" checked={formData.pricingAccepted} onChange={e => setFormData({ ...formData, pricingAccepted: e.target.checked })} style={{ accentColor: R, marginTop: 3, flexShrink: 0 }} />
+                    <input type="checkbox" checked={formData.pricingAccepted} onChange={e => setFormData({ ...formData, pricingAccepted: e.target.checked })} style={{ accentColor: R, marginTop: 3, flexShrink: 0, cursor: "pointer" }} />
                     <span style={{ lineHeight: 1.5 }}>
                       A decent villa typically costs around <strong>₹40,000</strong> for a one-night stay for 4BHK (8 adults). Food expenses are approximately <strong>₹2,500 per person</strong> for all meals. Would you like to go ahead with this pricing?
                     </span>
@@ -1135,7 +1265,7 @@ export default function BMCPLanding() {
                   <p style={{ fontSize: 12, color: "#DC2626", background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 6, padding: "9px 12px", margin: "0 0 10px" }}>{formMsg}</p>
                 )}
 
-                <button type="submit" disabled={formStatus === 'submitting' || !isStep2Valid()} style={{ width: "100%", padding: "11px 0", background: (formStatus === 'submitting' || !isStep2Valid()) ? "#aaa" : R, color: "#fff", border: "none", borderRadius: 8, fontSize: 14, fontWeight: 700, cursor: (formStatus === 'submitting' || !isStep2Valid()) ? "not-allowed" : "pointer", fontFamily: "var(--font-dm-sans), sans-serif", boxShadow: "0 4px 14px rgba(192,57,43,0.2)" }}>
+                <button type="submit" disabled={formStatus === 'submitting' || !isStep1Valid()} style={{ width: "100%", padding: "11px 0", background: (formStatus === 'submitting' || !isStep1Valid()) ? "#F3F4F6" : R, color: (formStatus === 'submitting' || !isStep1Valid()) ? "#9CA3AF" : "#fff", border: (formStatus === 'submitting' || !isStep1Valid()) ? "1px solid #E5E7EB" : "none", borderRadius: 8, fontSize: 14, fontWeight: 700, cursor: (formStatus === 'submitting' || !isStep1Valid()) ? "not-allowed" : "pointer", fontFamily: "var(--font-dm-sans), sans-serif", boxShadow: (formStatus === 'submitting' || !isStep1Valid()) ? "none" : "0 4px 14px rgba(192,57,43,0.2)" }}>
                   {formStatus === 'submitting' ? 'Sending...' : 'GET VENUE OPTIONS FREE →'}
                 </button>
                 <p style={{ fontSize: 10, color: "#999", textAlign: "center", margin: "6px 0 0" }}>By clicking, you accept our <Link href="/terms" style={{ color: "#999", textDecoration: "underline" }}>Terms & Conditions</Link></p>
@@ -1264,7 +1394,8 @@ export default function BMCPLanding() {
       */}
 
       {/* ===== VIDEO TESTIMONIALS ===== */}
-      <ReviewsSection />
+      {/* <ReviewsSection /> */}
+      <EventsSection />
 
       {/* ===== INSTAGRAM WIDGET ===== */}
       <InstagramWidget />
