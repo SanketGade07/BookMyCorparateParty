@@ -17,6 +17,38 @@ interface InstaPost {
 const posts: InstaPost[] = [
   {
     img: "/instagram-widget/post1.jpg",
+    alt: "How corporate event planning looks - Book My Corporate Party",
+    postUrl: "https://www.instagram.com/p/DdbiUCXk3lJ/?img_index=1",
+    likes: "480",
+    caption: "Great events look effortless, the planning behind them isn't. Let BookMyCorporateParty handle the chaos 🌟🎉",
+    isVideo: false
+  },
+  {
+    img: "/instagram-widget/post2.jpg",
+    alt: "Corporate Diwali celebration planning with Book My Corporate Party",
+    postUrl: "https://www.instagram.com/p/DdWTv8QT4pG/",
+    likes: "520",
+    caption: "Make this Diwali more than just an office event — Thoughtful planning, Festive energy, Memorable moments 🪔✨",
+    isVideo: true
+  },
+  {
+    img: "/instagram-widget/post3.jpg",
+    alt: "Similarities between corporate meeting and daru party",
+    postUrl: "https://www.instagram.com/p/DdMC1OZE-eR/?img_index=1",
+    likes: "445",
+    caption: "From boardroom talks to after-hours fun — every team deserves both. You bring the people, we handle the party 🥂🚀",
+    isVideo: false
+  },
+  {
+    img: "/instagram-widget/post4.jpg",
+    alt: "Corporate party to-do list planning made easy",
+    postUrl: "https://www.instagram.com/p/DdJZm-5zNs_/",
+    likes: "490",
+    caption: "Venue, food, music, entertainment — suddenly your to-do list has a to-do list. That's where we come in 🍷🎉",
+    isVideo: true
+  },
+  {
+    img: "/instagram-widget/post5.jpg",
     alt: "A little corporate event vocabulary lesson",
     postUrl: "https://www.instagram.com/p/Dc8oSx2k97z/?img_index=1",
     likes: "450",
@@ -24,7 +56,7 @@ const posts: InstaPost[] = [
     isVideo: false
   },
   {
-    img: "/instagram-widget/post2.jpg",
+    img: "/instagram-widget/post6.jpg",
     alt: "Featured in Forbes India - Book My Corporate Party",
     postUrl: "https://www.instagram.com/p/Dc3VD-XDGuX/?img_index=1",
     likes: "580",
@@ -32,7 +64,7 @@ const posts: InstaPost[] = [
     isVideo: false
   },
   {
-    img: "/instagram-widget/post3.jpg",
+    img: "/instagram-widget/post7.jpg",
     alt: "Corporate party planning made effortless",
     postUrl: "https://www.instagram.com/p/DcyeUPgk_yd/?img_index=1",
     likes: "412",
@@ -40,7 +72,7 @@ const posts: InstaPost[] = [
     isVideo: false
   },
   {
-    img: "/instagram-widget/post4.jpg",
+    img: "/instagram-widget/post8.jpg",
     alt: "Flawless corporate event execution",
     postUrl: "https://www.instagram.com/p/DcqkiDkk-Xz/?img_index=1",
     likes: "389",
@@ -48,7 +80,7 @@ const posts: InstaPost[] = [
     isVideo: false
   },
   {
-    img: "/instagram-widget/post5.jpg",
+    img: "/instagram-widget/post9.jpg",
     alt: "Skip the vendor chaos with BookMyCorporateParty",
     postUrl: "https://www.instagram.com/p/Dcn0G6tRoou/",
     likes: "620",
@@ -56,43 +88,11 @@ const posts: InstaPost[] = [
     isVideo: true
   },
   {
-    img: "/instagram-widget/post6.jpg",
+    img: "/instagram-widget/post10.jpg",
     alt: "Turn ordinary company parties into the event of the year",
     postUrl: "https://www.instagram.com/p/DcYf2QDE0yN/?img_index=1",
     likes: "475",
     caption: "Swipe through to see what turns an ordinary company party into the event of the year ➡️🎊",
-    isVideo: false
-  },
-  {
-    img: "/instagram-widget/post7.jpg",
-    alt: "HR party planning made easy",
-    postUrl: "https://www.instagram.com/p/DcTT0lgznJR/",
-    likes: "512",
-    caption: "Every HR can relate to this 😭 This time, let's make your job easier. Plan your next corporate party with us! 💼",
-    isVideo: true
-  },
-  {
-    img: "/instagram-widget/post8.jpg",
-    alt: "Enjoying the office party instead of managing it",
-    postUrl: "https://www.instagram.com/p/DcXvaTgRIF_/",
-    likes: "430",
-    caption: "You're actually enjoying the office party instead of managing it. That's the BMCP promise 🥂",
-    isVideo: true
-  },
-  {
-    img: "/instagram-widget/post9.jpg",
-    alt: "HR has enough on their plate - corporate party planning",
-    postUrl: "https://www.instagram.com/p/Dcdsd5EE2I_/?img_index=1",
-    likes: "395",
-    caption: "HR has enough on their plate. Party planning doesn't need to be one more thing. You bring the team, we do the rest 🌟",
-    isVideo: false
-  },
-  {
-    img: "/instagram-widget/post10.jpg",
-    alt: "Team celebration without the chaos",
-    postUrl: "https://www.instagram.com/p/DcQ-1-CE3Hy/?img_index=1",
-    likes: "460",
-    caption: "Let your team enjoy the event, we'll handle the chaos behind it 🏆🥳",
     isVideo: false
   }
 ];

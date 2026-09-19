@@ -2,16 +2,16 @@ const fs = require("fs");
 const path = require("path");
 
 const postsData = [
-  { id: 1, url: "https://www.instagram.com/p/Dc8oSx2k97z/?img_index=1" },
-  { id: 2, url: "https://www.instagram.com/p/Dc3VD-XDGuX/?img_index=1" },
-  { id: 3, url: "https://www.instagram.com/p/DcyeUPgk_yd/?img_index=1" },
-  { id: 4, url: "https://www.instagram.com/p/DcqkiDkk-Xz/?img_index=1" },
-  { id: 5, url: "https://www.instagram.com/p/Dcn0G6tRoou/" },
-  { id: 6, url: "https://www.instagram.com/p/DcYf2QDE0yN/?img_index=1" },
-  { id: 7, url: "https://www.instagram.com/p/DcTT0lgznJR/" },
-  { id: 8, url: "https://www.instagram.com/p/DcXvaTgRIF_/" },
-  { id: 9, url: "https://www.instagram.com/p/Dcdsd5EE2I_/?img_index=1" },
-  { id: 10, url: "https://www.instagram.com/p/DcQ-1-CE3Hy/?img_index=1" }
+  { id: 1, url: "https://www.instagram.com/p/DdbiUCXk3lJ/?img_index=1" },
+  { id: 2, url: "https://www.instagram.com/p/DdWTv8QT4pG/" },
+  { id: 3, url: "https://www.instagram.com/p/DdMC1OZE-eR/?img_index=1" },
+  { id: 4, url: "https://www.instagram.com/p/DdJZm-5zNs_/" },
+  { id: 5, url: "https://www.instagram.com/p/Dc8oSx2k97z/?img_index=1" },
+  { id: 6, url: "https://www.instagram.com/p/Dc3VD-XDGuX/?img_index=1" },
+  { id: 7, url: "https://www.instagram.com/p/DcyeUPgk_yd/?img_index=1" },
+  { id: 8, url: "https://www.instagram.com/p/DcqkiDkk-Xz/?img_index=1" },
+  { id: 9, url: "https://www.instagram.com/p/Dcn0G6tRoou/" },
+  { id: 10, url: "https://www.instagram.com/p/DcYf2QDE0yN/?img_index=1" }
 ];
 
 const outputDir = path.join(__dirname, "../public/images/instagram");
