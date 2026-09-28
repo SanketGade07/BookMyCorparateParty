@@ -1,5 +1,6 @@
 import Script from "next/script";
 import "./globals.css";
+import TidioChat from "../components/TidioChat";
 
 export const metadata = {
   title: "Book Corporate Party Venues in 30 Minutes | Free for HR Teams",
@@ -24,6 +25,7 @@ export default function RootLayout({ children }) {
       </head>
       <body style={{ fontFamily: "var(--font-dm-sans), sans-serif", margin: 0 }}>
         {children}
+        <TidioChat />
       </body>
       <Script
         src="https://www.googletagmanager.com/gtag/js?id=G-Z4D7SK0ZCF"

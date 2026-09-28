@@ -563,6 +563,19 @@ export default function BMCPLanding() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showWaPopup, setShowWaPopup] = useState(false);
   const [waForm, setWaForm] = useState({ name: '', phone: '', event: '' });
+  const SHOW_EXPERT_CHAT = false; // Set to true when ready to display "Talk to Expert"
+  const [tidioNotice, setTidioNotice] = useState(false);
+
+  const handleOpenExpertChat = () => {
+    if (typeof window !== "undefined" && (window as any).tidioChatApi) {
+      (window as any).tidioChatApi.show();
+      (window as any).tidioChatApi.open();
+    } else {
+      setTidioNotice(true);
+      setTimeout(() => setTidioNotice(false), 5500);
+    }
+  };
+
   const userGeo = useGeoLocation();
   const visitorTracked = useRef(false);
   const testimonialRowRef = useRef<HTMLDivElement>(null);
@@ -1301,28 +1314,29 @@ export default function BMCPLanding() {
                   display: "inline-flex",
                   alignItems: "center",
                   gap: 10,
-                  background: "#25D366",
+                  background: "linear-gradient(135deg, #A8201A 0%, #80281F 100%)",
                   color: "#fff",
-                  border: "none",
-                  borderRadius: 9,
-                  padding: "13px 24px",
+                  border: "1px solid rgba(255, 255, 255, 0.22)",
+                  borderRadius: 10,
+                  padding: "14px 26px",
                   fontSize: 14,
                   fontWeight: 800,
-                  letterSpacing: "0.3px",
+                  letterSpacing: "0.35px",
                   cursor: "pointer",
-                  boxShadow: "0 6px 18px rgba(37, 211, 102, 0.35)",
-                  transition: "all 0.2s ease",
-                  fontFamily: "var(--font-dm-sans), sans-serif"
+                  boxShadow: "0 8px 24px rgba(128, 40, 31, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.25)",
+                  transition: "all 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
+                  fontFamily: "var(--font-dm-sans), sans-serif",
+                  textShadow: "0 1px 2px rgba(0, 0, 0, 0.25)"
                 }}
                 onMouseEnter={e => {
-                  e.currentTarget.style.background = "#20ba5a";
+                  e.currentTarget.style.background = "linear-gradient(135deg, #C22D26 0%, #8E2319 100%)";
                   e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow = "0 8px 22px rgba(37, 211, 102, 0.45)";
+                  e.currentTarget.style.boxShadow = "0 12px 30px rgba(128, 40, 31, 0.58), inset 0 1px 0 rgba(255, 255, 255, 0.35)";
                 }}
                 onMouseLeave={e => {
-                  e.currentTarget.style.background = "#25D366";
+                  e.currentTarget.style.background = "linear-gradient(135deg, #A8201A 0%, #80281F 100%)";
                   e.currentTarget.style.transform = "none";
-                  e.currentTarget.style.boxShadow = "0 6px 18px rgba(37, 211, 102, 0.35)";
+                  e.currentTarget.style.boxShadow = "0 8px 24px rgba(128, 40, 31, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.25)";
                 }}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -2624,10 +2638,101 @@ export default function BMCPLanding() {
         </div>
       </footer>
 
-      {/* ===== FLOATING VIP CONCIERGE (WHATSAPP) ===== */}
-      <button onClick={() => setShowWaPopup(true)} className="whatsapp-fab" style={{ position: "fixed", bottom: 32, right: 32, width: 64, height: 64, background: R, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 10px 30px ${R}4D`, zIndex: 1000, transition: "transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)", border: "none", cursor: "pointer" }} onMouseEnter={e => e.currentTarget.style.transform = "scale(1.15) rotate(8deg)"} onMouseLeave={e => e.currentTarget.style.transform = "none"}>
-        <svg width="34" height="34" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.414 0 .004 5.408 0 12.044c0 2.123.555 4.197 1.608 6.02L0 24l6.128-1.608a11.847 11.847 0 0 0 5.922 1.583h.005c6.637 0 12.046-5.41 12.051-12.048a11.82 11.82 0 0 0-3.526-8.528"></path></svg>
-      </button>
+      {/* ===== FLOATING ACTION BUTTONS (TALK TO EXPERT + WHATSAPP) ===== */}
+      <div className="floating-actions-container" style={{ position: "fixed", bottom: 28, right: 28, display: "flex", alignItems: "center", gap: 12, zIndex: 1000 }}>
+        {/* Notice toast if Tidio is loading or key not configured */}
+        {SHOW_EXPERT_CHAT && tidioNotice && (
+          <div
+            style={{
+              position: "absolute",
+              bottom: "calc(100% + 14px)",
+              right: 0,
+              background: "#111827",
+              color: "#fff",
+              padding: "16px 18px",
+              borderRadius: 14,
+              boxShadow: "0 18px 40px rgba(0,0,0,0.38)",
+              fontSize: 12.5,
+              width: 300,
+              zIndex: 10001,
+              border: "1px solid rgba(255,255,255,0.15)",
+              fontFamily: "var(--font-dm-sans), sans-serif",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+              <span style={{ fontWeight: 700, fontSize: 13, display: "flex", alignItems: "center", gap: 6, color: "#fff" }}>
+                💬 Chatbot Ready to Connect
+              </span>
+              <button
+                onClick={() => setTidioNotice(false)}
+                style={{ background: "none", border: "none", color: "#9CA3AF", cursor: "pointer", fontSize: 16, padding: 0, lineHeight: 1 }}
+              >
+                ✕
+              </button>
+            </div>
+            <p style={{ margin: "0 0 12px", color: "#D1D5DB", lineHeight: 1.5, fontSize: 12 }}>
+              Add your <strong>NEXT_PUBLIC_TIDIO_KEY</strong> in <code>.env</code> to activate live chat, or speak with our expert on WhatsApp directly!
+            </p>
+            <button
+              onClick={() => {
+                setTidioNotice(false);
+                setShowWaPopup(true);
+              }}
+              style={{
+                width: "100%",
+                background: "#25D366",
+                color: "#fff",
+                border: "none",
+                borderRadius: 8,
+                padding: "9px 14px",
+                fontSize: 12.5,
+                fontWeight: 700,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 6,
+                boxShadow: "0 4px 12px rgba(37, 211, 102, 0.3)",
+              }}
+            >
+              Chat on WhatsApp Instead →
+            </button>
+          </div>
+        )}
+
+        {/* 1. Talk to Expert (Tidio Chatbot Trigger) — Hidden for now */}
+        {SHOW_EXPERT_CHAT && (
+          <button
+            onClick={handleOpenExpertChat}
+            className="expert-fab"
+            aria-label="Talk to Expert"
+            title="Talk to Expert"
+          >
+            <div className="expert-fab-dot-wrapper">
+              <div className="expert-fab-dot" />
+              <div className="expert-fab-dot-pulse" />
+            </div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span className="fab-full-text">Talk to Expert</span>
+            <span className="fab-short-text">Expert</span>
+          </button>
+        )}
+
+        {/* 2. WhatsApp VIP Concierge Button */}
+        <button
+          onClick={() => setShowWaPopup(true)}
+          className="whatsapp-fab-btn"
+          aria-label="Chat on WhatsApp"
+          title="Chat on WhatsApp"
+          style={!SHOW_EXPERT_CHAT ? { width: 64, height: 64 } : undefined}
+        >
+          <svg width={!SHOW_EXPERT_CHAT ? "34" : "28"} height={!SHOW_EXPERT_CHAT ? "34" : "28"} viewBox="0 0 24 24" fill="#fff">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.414 0 .004 5.408 0 12.044c0 2.123.555 4.197 1.608 6.02L0 24l6.128-1.608a11.847 11.847 0 0 0 5.922 1.583h.005c6.637 0 12.046-5.41 12.051-12.048a11.82 11.82 0 0 0-3.526-8.528"></path>
+          </svg>
+        </button>
+      </div>
 
       {/* ===== WHATSAPP POPUP MODAL ===== */}
       {showWaPopup && (
