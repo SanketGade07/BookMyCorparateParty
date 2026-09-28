@@ -1296,7 +1296,7 @@ export default function BMCPLanding() {
                   display: "inline-flex",
                   alignItems: "center",
                   gap: 10,
-                  background: R,
+                  background: "#25D366",
                   color: "#fff",
                   border: "none",
                   borderRadius: 9,
@@ -1305,17 +1305,19 @@ export default function BMCPLanding() {
                   fontWeight: 800,
                   letterSpacing: "0.3px",
                   cursor: "pointer",
-                  boxShadow: "0 6px 18px rgba(128, 40, 31, 0.35)",
+                  boxShadow: "0 6px 18px rgba(37, 211, 102, 0.35)",
                   transition: "all 0.2s ease",
                   fontFamily: "var(--font-dm-sans), sans-serif"
                 }}
                 onMouseEnter={e => {
+                  e.currentTarget.style.background = "#20ba5a";
                   e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow = "0 8px 22px rgba(128, 40, 31, 0.45)";
+                  e.currentTarget.style.boxShadow = "0 8px 22px rgba(37, 211, 102, 0.45)";
                 }}
                 onMouseLeave={e => {
+                  e.currentTarget.style.background = "#25D366";
                   e.currentTarget.style.transform = "none";
-                  e.currentTarget.style.boxShadow = "0 6px 18px rgba(128, 40, 31, 0.35)";
+                  e.currentTarget.style.boxShadow = "0 6px 18px rgba(37, 211, 102, 0.35)";
                 }}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -1692,25 +1694,21 @@ export default function BMCPLanding() {
           ))}
         </div>
 
-        {/* The BMCP Proposition Banner */}
+        {/* The BMCP Proposition Text */}
         <div style={{
           marginTop: 28,
-          background: "#FFFFFF",
-          border: `1px solid ${B}`,
-          borderRadius: 14,
-          padding: "20px 24px",
           textAlign: "center",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.03)"
+          padding: "0 16px"
         }}>
           <p
             className="bmcp-promise-text"
             style={{
               margin: 0,
               fontFamily: "var(--font-dm-sans), sans-serif",
-              fontSize: "clamp(13px, 1.3vw, 15.5px)",
-              fontWeight: 600,
+              fontSize: "clamp(14px, 1.35vw, 16px)",
+              fontWeight: 500,
               color: D,
-              lineHeight: 1.5,
+              lineHeight: 1.6,
               textAlign: "center",
               width: "100%"
             }}
