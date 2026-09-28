@@ -1,24 +1,5 @@
-import { DM_Sans, Playfair_Display, Unbounded } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
-
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  variable: "--font-dm-sans",
-  weight: ["400", "500", "600", "700"],
-});
-
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  variable: "--font-playfair",
-  weight: ["600", "700"],
-});
-
-const unbounded = Unbounded({
-  subsets: ["latin"],
-  variable: "--font-unbounded",
-  weight: ["400", "700", "800"],
-});
 
 export const metadata = {
   title: "Book Corporate Party Venues in 30 Minutes | Free for HR Teams",
@@ -32,7 +13,15 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${dmSans.variable} ${playfair.variable} ${unbounded.variable}`}>
+    <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Unbounded:wght@400;700;800&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body style={{ fontFamily: "var(--font-dm-sans), sans-serif", margin: 0 }}>
         {children}
       </body>

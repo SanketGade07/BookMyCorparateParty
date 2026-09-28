@@ -877,6 +877,11 @@ export default function BMCPLanding() {
           grid-template-columns: repeat(3, 1fr);
           gap: 22px;
         }
+        @media (min-width: 1025px) {
+          .hr-problems-grid > div:last-child {
+            grid-column: 2;
+          }
+        }
         .bmcp-solutions-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
