@@ -109,6 +109,21 @@ function VenueCard({ v }: { v: Venue }) {
   );
 }
 
+export const OCCASIONS = [
+  "Annual Day / Annual Gala",
+  "Diwali Party / Festival Celebration",
+  "Year-End / Christmas Party",
+  "Team Outing / Team Building",
+  "Annual Conference / Business Summit",
+  "Awards & Recognition / R&R Event",
+  "Offsite / Leadership Retreat",
+  "Employee Wellness & Sports Events",
+  "Product Launch / Brand Events",
+  "Independence Day / Republic Day Celebrations",
+  "COCKTAIL PARTY",
+  "TEAM LUNCH / DINNER",
+] as const;
+
 type FormType = '' | 'villa' | 'lounge' | 'banquet' | 'nightclub' | 'catering';
 
 const VENUE_LABEL: Record<Exclude<FormType, ''>, string> = {
@@ -134,6 +149,331 @@ const formatDate = (dateStr: string) => {
   if (!y || !m || !d) return dateStr;
   return `${d}-${m}-${y}`;
 };
+
+const HR_PROBLEMS = [
+  {
+    num: "01",
+    title: "Finding the right venue",
+    desc: (
+      <>
+        Too many options, but difficult to find one that fits the{" "}
+        <strong>budget, capacity, location and event requirement</strong>.
+      </>
+    ),
+    solution: "We shortlist 3–5 verified corporate venues matching your exact headcount, location, vibe and budget in 30 minutes.",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+        <circle cx="12" cy="10" r="3" />
+      </svg>
+    ),
+  },
+  {
+    num: "02",
+    title: "Getting multiple quotations",
+    desc: (
+      <>
+        HR has to contact <strong>10–20 venues/vendors</strong> just to compare packages and prices.
+      </>
+    ),
+    solution: "1 single enquiry gets you standardized, pre-packaged quotations directly on WhatsApp to compare side-by-side.",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+        <polyline points="14 2 14 8 20 8" />
+        <line x1="16" y1="13" x2="8" y2="13" />
+        <line x1="16" y1="17" x2="8" y2="17" />
+      </svg>
+    ),
+  },
+  {
+    num: "03",
+    title: "Unclear pricing & hidden costs",
+    desc: (
+      <>
+        Taxes, service charges, corkage, décor, AV, minimum billing and other extras can make the{" "}
+        <strong>final bill very different from the initial quote</strong>.
+      </>
+    ),
+    solution: "100% transparent, all-inclusive per-person quotes with all taxes, AV, corkage & service fees locked in upfront.",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="12" y1="1" x2="12" y2="23" />
+        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+      </svg>
+    ),
+  },
+  {
+    num: "04",
+    title: "Vendor coordination",
+    desc: (
+      <>
+        Managing the venue, caterer, DJ, décor, photographer, anchor, entertainment and other vendors separately{" "}
+        <strong>becomes a headache</strong>.
+      </>
+    ),
+    solution: "Single point of contact: venue, DJ, food, bar, décor, anchor & AV bundled together under one coordination team.",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="12 2 2 7 12 12 22 7 12 2" />
+        <polyline points="2 17 12 22 22 17" />
+        <polyline points="2 12 12 17 22 12" />
+      </svg>
+    ),
+  },
+  {
+    num: "05",
+    title: "Negotiating with vendors",
+    desc: (
+      <>
+        HR often has to <strong>negotiate prices, inclusions, upgrades and cancellation terms individually</strong>.
+      </>
+    ),
+    solution: "We leverage our volume corporate purchasing power to secure negotiated corporate pricing & free upgrades for you.",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <polyline points="16 11 18 13 22 9" />
+      </svg>
+    ),
+  },
+  {
+    num: "06",
+    title: "Checking availability",
+    desc: (
+      <>
+        A venue may look perfect online but may <strong>not actually be available</strong> for the required date and time.
+      </>
+    ),
+    solution: "Real-time slot verification: we only present options that are confirmed available and blocked for your exact dates.",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+        <line x1="16" y1="2" x2="16" y2="6" />
+        <line x1="8" y1="2" x2="8" y2="6" />
+        <line x1="3" y1="10" x2="21" y2="10" />
+      </svg>
+    ),
+  },
+  {
+    num: "07",
+    title: "Budget pressure",
+    desc: (
+      <>
+        HR has to deliver a memorable event while staying within a fixed{" "}
+        <strong>per-person or total budget</strong>.
+      </>
+    ),
+    solution: "Budget-first customization: tailored packages designed to deliver maximum food, bar & vibe without cost overruns.",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="23 18 13.5 8.5 8.5 13.5 1 6" />
+        <polyline points="17 18 23 18 23 12" />
+      </svg>
+    ),
+  },
+  {
+    num: "08",
+    title: "Reliability & quality concerns",
+    desc: (
+      <>
+        It's difficult to know whether a venue/vendor will <strong>actually deliver what was promised</strong>.
+      </>
+    ),
+    solution: "Every venue is vetted for corporate standards with SLA guarantees, verified track records & site visits arranged.",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        <polyline points="9 12 11 14 15 10" />
+      </svg>
+    ),
+  },
+  {
+    num: "09",
+    title: "Last-minute changes",
+    desc: (
+      <>
+        Guest count, menu, timings, décor or entertainment can change, creating <strong>additional coordination</strong>.
+      </>
+    ),
+    solution: "Dedicated on-ground coordinator manages headcount shifts, diet requests & schedule tweaks seamlessly.",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="23 4 23 10 17 10" />
+        <polyline points="1 20 1 14 7 14" />
+        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+      </svg>
+    ),
+  },
+  {
+    num: "10",
+    title: "Too much time spent on event planning",
+    desc: (
+      <>
+        HR's core job isn't event sourcing, yet they can end up spending{" "}
+        <strong>days coordinating vendors, calls, quotations and follow-ups</strong>.
+      </>
+    ),
+    solution: "Save 40+ hours of operational hassle. We handle the entire legwork so you look like a rockstar to your leadership.",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 16 14" />
+      </svg>
+    ),
+  },
+];
+
+const BMCP_SOLUTIONS = [
+  {
+    num: "01",
+    title: "One Enquiry. Multiple Curated Options.",
+    desc: "Tell us your date, location, budget and team size—we shortlist suitable venues for you.",
+    tag: "Curated Shortlists",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="12 2 2 7 12 12 22 7 12 2" />
+        <polyline points="2 17 12 22 22 17" />
+        <polyline points="2 12 12 17 22 12" />
+      </svg>
+    ),
+  },
+  {
+    num: "02",
+    title: "Save Hours of Venue Hunting",
+    desc: "No calling 20–30 venues, chasing responses or comparing scattered WhatsApp quotes.",
+    tag: "Zero Calling Hassle",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 16 14" />
+      </svg>
+    ),
+  },
+  {
+    num: "03",
+    title: "Corporate Events Are Our Specialty",
+    desc: "We focus specifically on corporate parties, team outings, annual celebrations, offsites, R&R events and business gatherings.",
+    tag: "100% Corporate Events",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+      </svg>
+    ),
+  },
+  {
+    num: "04",
+    title: "Handpicked & Pre-Verified Venues",
+    desc: "Get access to curated lounges, restaurants, nightclubs, banquets, resorts, villas and activity venues.",
+    tag: "Pre-Verified & Inspected",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        <polyline points="9 12 11 14 15 10" />
+      </svg>
+    ),
+  },
+  {
+    num: "05",
+    title: "Fast Venue Shortlisting",
+    desc: "Get relevant venue options and packages quickly, with our team delivering curated options within 30 minutes.",
+    tag: "Options in 30 Mins",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+      </svg>
+    ),
+  },
+  {
+    num: "06",
+    title: "Transparent Pricing",
+    desc: "Compare packages, inclusions and pricing upfront, making internal leadership approvals effortless.",
+    tag: "Upfront Cost Breakdowns",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="12" y1="1" x2="12" y2="23" />
+        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+      </svg>
+    ),
+  },
+  {
+    num: "07",
+    title: "Negotiated Corporate Packages",
+    desc: "We work with venues to create packages around your budget, guest count, food, beverages and entertainment requirements.",
+    tag: "Negotiated Bulk Rates",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+        <line x1="7" y1="7" x2="7.01" y2="7" />
+      </svg>
+    ),
+  },
+  {
+    num: "08",
+    title: "One Point of Contact",
+    desc: "One team coordinates with the venue instead of making HR/Admin teams manage multiple vendors and venue managers.",
+    tag: "1 Dedicated SPOC",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      </svg>
+    ),
+  },
+  {
+    num: "09",
+    title: "End-to-End Event Support",
+    desc: "Beyond the venue: food & beverage, DJ, entertainment, décor, branding, activities and vendor coordination can all be managed.",
+    tag: "Complete Event Ops",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+        <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+        <line x1="12" y1="22.08" x2="12" y2="12" />
+      </svg>
+    ),
+  },
+  {
+    num: "10",
+    title: "From 20 to 2,000+ Guests",
+    desc: "Solutions for small team celebrations as well as large annual parties, offsites and corporate gatherings.",
+    tag: "20 to 2,000+ Capacity",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <polyline points="16 11 18 13 22 9" />
+      </svg>
+    ),
+  },
+  {
+    num: "11",
+    title: "Last-Minute Booking Support",
+    desc: "When the event date is approaching fast, our priority team helps identify and secure available options on tight deadlines.",
+    tag: "Express SOS Availability",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+      </svg>
+    ),
+  },
+  {
+    num: "12",
+    title: "Local Venue Expertise",
+    desc: "Get recommendations based on location, budget, event format and the experience you want—not just a generic directory listing.",
+    tag: "Hyperlocal City Intel",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+        <circle cx="12" cy="10" r="3" />
+      </svg>
+    ),
+  },
+];
 
 export default function BMCPLanding() {
   const router = useRouter();
@@ -204,29 +544,10 @@ export default function BMCPLanding() {
   };
 
   const [formData, setFormData] = useState({
-    formType: '' as FormType,
-    // Villa / Resort
-    checkInDate: '',
-    checkOutDate: '',
-    totalPax: '',
-    totalKids: '',
-    food: '',
-    pricingAccepted: false,
-    // Lounge & Banquet shared
-    date: '',
-    noOfPeople: '',
-    location: '',
-    // Lounge only
-    budgetOnlyFood: '',
-    budgetWithDrinks: '',
-    typeOfMeal: '',
-    // Banquet only
-    foodType: '',
-    budget: '',
-    // Step 2 (contact)
+    occasion: '',
     name: '',
-    whatsappNumber: '',
     email: '',
+    whatsappNumber: '',
     source: '',
   });
   const [utmData, setUtmData] = useState({
@@ -237,7 +558,6 @@ export default function BMCPLanding() {
     utmContent: '',
     gclid: '',
   });
-  const [formStep, setFormStep] = useState<1 | 2>(1);
   const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [formMsg, setFormMsg] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
@@ -270,7 +590,7 @@ export default function BMCPLanding() {
   const sendPartialLead = () => {
     if (partialSentRef.current || isSubmittedRef.current) return;
     const f = formDataRef.current;
-    if (!f.formType || !f.name || !f.whatsappNumber || !isValidPhone(f.whatsappNumber)) return;
+    if (!f.name || !f.whatsappNumber || !isValidPhone(f.whatsappNumber)) return;
 
     partialSentRef.current = true;
     if (timerRef.current) {
@@ -278,7 +598,6 @@ export default function BMCPLanding() {
       timerRef.current = null;
     }
 
-    const venueLabel = f.formType ? VENUE_LABEL[f.formType] : '';
     const uGeo = userGeoRef.current;
     const uUtm = utmDataRef.current;
 
@@ -288,13 +607,13 @@ export default function BMCPLanding() {
       keepalive: true,
       body: JSON.stringify({
         isPartial: true,
-        formType: f.formType,
+        occasion: f.occasion,
         name: f.name,
         phone: f.whatsappNumber,
         email: f.email,
-        source: f.source,
+        source: f.source || 'Website',
         whatsapp: true,
-        event: venueLabel,
+        event: f.occasion || 'Corporate Party Enquiry',
         city: 'Mumbai',
         area: '',
         venueDate: '',
@@ -305,6 +624,15 @@ export default function BMCPLanding() {
       }),
     }).catch(() => {});
   };
+
+  useEffect(() => {
+    if (isValidPhone(formData.whatsappNumber) && formData.name && !isSubmittedRef.current && !partialSentRef.current) {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => {
+        sendPartialLead();
+      }, 45000);
+    }
+  }, [formData.whatsappNumber, formData.name]);
 
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -404,65 +732,34 @@ export default function BMCPLanding() {
     router.push('/thank-you?chat=1');
   };
 
-  const handleStep1 = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!isStep2Valid()) return;
-
-    isSubmittedRef.current = false;
-    partialSentRef.current = false;
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-    }
-
-    setFormStep(2);
-
-    timerRef.current = setTimeout(() => {
-      sendPartialLead();
-    }, 45000);
-  };
-
-  const isStep1Valid = () => {
+  const isFormValid = () => {
     const f = formData;
-    const contactValid = !!(f.formType && f.name && f.whatsappNumber && f.email && f.source && isValidPhone(f.whatsappNumber));
-    if (!contactValid) return false;
-    if (f.formType === 'villa' && !f.pricingAccepted) return false;
-    return true;
-  };
-
-  const isStep2Valid = () => {
-    const f = formData;
-    if (!f.formType) return false;
-    if (f.formType === 'villa') {
-      if (!f.checkInDate || !f.checkOutDate || !f.totalPax || !f.food) return false;
-      if (parseInt(f.totalPax || '0', 10) < 20) return false;
-      return true;
-    }
-    if (f.formType === 'lounge' || f.formType === 'nightclub') {
-      if (!(f.date && f.noOfPeople && f.location && f.budgetOnlyFood && f.budgetWithDrinks && f.typeOfMeal)) return false;
-      return parseInt(f.noOfPeople || '0', 10) >= 20;
-    }
-    if (f.formType === 'banquet' || f.formType === 'catering') {
-      if (!(f.date && f.noOfPeople && f.location && f.foodType && f.budget)) return false;
-      return parseInt(f.noOfPeople || '0', 10) >= 20;
-    }
-    return false;
+    return !!(
+      f.occasion &&
+      f.name &&
+      f.name.trim() &&
+      f.email &&
+      f.email.includes('@') &&
+      f.whatsappNumber &&
+      isValidPhone(f.whatsappNumber)
+    );
   };
 
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
-    if (!isStep1Valid()) return;
+    if (!isFormValid()) return;
 
     if (!otpVerified) {
       if (otpSent) {
         if (!otpCode || !otpCode.trim()) {
-          setOtpError('Please enter the OTP code sent to your WhatsApp number.');
+          setOtpError('Please enter the OTP code sent to your phone.');
           return;
         }
         const verified = await handleVerifyOtp(otpCode);
         if (!verified) return;
       } else {
-        setOtpError('Please send and verify OTP for your WhatsApp number.');
-        handleSendOtp();
+        setOtpError('Please verify your phone number with the OTP code.');
+        await handleSendOtp();
         return;
       }
     }
@@ -477,62 +774,38 @@ export default function BMCPLanding() {
     setFormMsg('');
     try {
       const f = formData;
-      const venueLabel = f.formType ? VENUE_LABEL[f.formType] : '';
-      const cityForServer = f.formType === 'villa' ? 'Mumbai' : f.location;
-      const dateForServer = f.formType === 'villa' ? f.checkInDate : f.date;
-
       const res = await fetch('/api/submit-form', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          formType: f.formType,
+          occasion: f.occasion,
           name: f.name,
           phone: f.whatsappNumber,
           email: f.email,
-          source: f.source,
+          source: f.source || 'Website',
           whatsapp: true,
-          // Villa
-          checkInDate: f.checkInDate,
-          checkOutDate: f.checkOutDate,
-          totalPax: f.totalPax,
-          food: f.food,
-          pricingAccepted: f.pricingAccepted,
-          // Lounge / Banquet
-          date: f.date,
-          day: dayFromDate(f.date),
-          noOfPeople: f.noOfPeople,
-          location: f.location,
-          budgetOnlyFood: f.budgetOnlyFood,
-          budgetWithDrinks: f.budgetWithDrinks,
-          typeOfMeal: f.typeOfMeal,
-          foodType: f.foodType,
-          budget: f.budget,
-          // Backwards-compat keys
-          event: venueLabel,
-          city: cityForServer,
+          event: f.occasion,
+          city: 'Mumbai',
           area: '',
-          venueDate: dateForServer,
+          venueDate: '',
           userLocation: userGeo ? `${userGeo.city}, ${userGeo.region}, ${userGeo.country}` : 'Unknown',
           userPincode: userGeo ? userGeo.pincode : 'Unknown',
           userIp: userGeo ? userGeo.ip : 'Unknown',
-          // UTM / ad tracking
           ...utmData,
         }),
       });
       const data = await res.json();
       if (res.ok && data.success) {
         setFormData({
-          formType: '' as FormType,
-          checkInDate: '', checkOutDate: '', totalPax: '', totalKids: '', food: '', pricingAccepted: false,
-          date: '', noOfPeople: '', location: '',
-          budgetOnlyFood: '', budgetWithDrinks: '', typeOfMeal: '',
-          foodType: '', budget: '',
-          name: '', whatsappNumber: '', email: '', source: '',
+          occasion: '',
+          name: '',
+          whatsappNumber: '',
+          email: '',
+          source: '',
         });
         setOtpSent(false);
         setOtpCode('');
         setOtpVerified(false);
-        setFormStep(1);
         router.push('/thank-you');
       } else {
         setFormStatus('error');
@@ -588,6 +861,42 @@ export default function BMCPLanding() {
           cursor: pointer !important;
           z-index: 2 !important;
         }
+        .features-grid {
+          display: grid;
+          grid-template-columns: repeat(5, 1fr);
+          gap: 18px;
+        }
+        @media (max-width: 1100px) {
+          .features-grid {
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 14px !important;
+          }
+        }
+        .hr-problems-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 22px;
+        }
+        .bmcp-solutions-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 22px;
+        }
+        .bmcp-promise-text {
+          white-space: nowrap;
+        }
+        @media (max-width: 992px) {
+          .bmcp-promise-text {
+            white-space: normal !important;
+          }
+        }
+        @media (max-width: 1024px) {
+          .hr-problems-grid,
+          .bmcp-solutions-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 18px !important;
+          }
+        }
         @media (max-width: 768px) {
           .nav-links, .nav-actions { display: none !important; }
           .hamburger-btn { display: flex !important; }
@@ -611,6 +920,18 @@ export default function BMCPLanding() {
           }
           .features-grid > div {
             padding: 20px 16px !important;
+          }
+
+          /* HR Problems - 1 column on mobile */
+          .hr-problems-grid {
+            grid-template-columns: 1fr !important;
+            gap: 14px !important;
+          }
+
+          /* BMCP Solutions - 1 column on mobile */
+          .bmcp-solutions-grid {
+            grid-template-columns: 1fr !important;
+            gap: 14px !important;
           }
 
           .venue-grid {
@@ -728,58 +1049,13 @@ export default function BMCPLanding() {
             scroll-snap-align: start !important;
           }
 
-          /* Comparison Table - synchronized grid on mobile */
-          .table-scroll-wrap {
-            overflow: hidden !important;
-            border: 1px solid #E5E7EB !important;
-            border-radius: 14px !important;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.06) !important;
-          }
-          .table-header-row, 
-          .table-data-row {
-            display: grid !important;
-            grid-template-columns: 1fr 1.4fr 1.1fr !important; /* Balanced for common mobile widths */
-            width: 100% !important;
-          }
-          .table-header-row {
-            font-size: 8.5px !important;
-            letter-spacing: 0.3px !important;
-            line-height: 1.3 !important;
-          }
-          .table-header-row > div {
-            padding: 12px 6px !important;
-            word-break: break-all !important; /* Forces header text to stay in bounds */
+          /* Comparison Matrix - Horizontal scroll with sticky entity column on mobile */
+          .matrix-scroll-hint {
             display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            text-align: center !important;
           }
-          .table-header-row > div:first-child { justify-content: flex-start !important; text-align: left !important; }
-          .table-data-row {
-            margin-bottom: 0 !important;
-            border-radius: 0 !important;
-            box-shadow: none !important;
-            border-bottom: 1px solid #F0F0F0 !important;
-          }
-          .table-data-row:last-child { border-bottom: none !important; }
-          .table-data-row > div {
-            padding: 10px 6px !important;
-            font-size: 10.5px !important;
-            display: flex !important;
-            align-items: center !important;
-          }
-          .table-data-row > div:nth-child(2) {
-            border-left: 1px solid #F0F0F0 !important;
-            border-right: 1px solid #F0F0F0 !important;
-            font-weight: 700 !important;
-          }
-          .table-data-row > div:nth-child(3) {
-            color: #6B7280 !important;
-          }
-          .table-data-row > div:nth-child(2) svg,
-          .table-data-row > div:nth-child(3) svg {
-            width: 14px !important;
-            height: 14px !important;
+          .matrix-scroll-wrap {
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch !important;
           }
 
           /* CTA section */
@@ -891,6 +1167,7 @@ export default function BMCPLanding() {
               {[
                 { name: "Why Us", href: "#why-us" },
                 { name: "Venues", href: "#venues" },
+                { name: "Solutions", href: "#solutions" },
                 { name: "Process", href: "#how-it-works" },
                 { name: "FAQ", href: "#faq" }
               ].map(link => (
@@ -920,6 +1197,7 @@ export default function BMCPLanding() {
           {[
             { name: "Why Us", href: "#why-us" },
             { name: "Venues", href: "#venues" },
+            { name: "Solutions", href: "#solutions" },
             { name: "Process", href: "#how-it-works" },
             { name: "FAQ", href: "#faq" }
           ].map((link, i) => (
@@ -947,45 +1225,111 @@ export default function BMCPLanding() {
         position: "relative",
         overflow: "hidden"
       }}>
-        <div style={{ position: "absolute", top: -120, right: -80, width: 420, height: 420, background: `radial-gradient(circle, rgba(192,57,43,0.12) 0%, transparent 70%)`, borderRadius: "50%" }} />
-        <div className="hero-container" style={{ width: "100%", padding: "0 clamp(100px, 8vw, 200px)", display: "flex", gap: 48, alignItems: "flex-start", flexWrap: "wrap", boxSizing: "border-box" }}>
+        <div style={{ position: "absolute", top: -120, right: -80, width: 420, height: 420, background: `radial-gradient(circle, rgba(192,57,43,0.12) 0%, transparent 70%)`, borderRadius: "50%", pointerEvents: "none" }} />
+        <div className="hero-container" style={{ position: "relative", zIndex: 2, width: "100%", padding: "0 clamp(100px, 8vw, 200px)", display: "flex", gap: 48, alignItems: "flex-start", flexWrap: "wrap", boxSizing: "border-box" }}>
           <div className="hero-text" style={{ flex: "1 1 520px", paddingTop: 8 }}>
-            <Badge text="Corporate Party Platform" />
+            <Badge text="STOP CHASING VENUES." />
             <h1 style={{ fontFamily: "var(--font-playfair), serif", fontSize: "clamp(32px, 4.8vw, 54px)", fontWeight: 700, color: "#fff", lineHeight: 1.15, margin: "16px 0 14px" }}>
-              Stop Calling 20 Venues.{" "}
-              <span style={{ color: "#FF5252" }}>Book Your Corporate Party in One Click.</span>
+              Get 5 Corporate Party Quotes{" "}
+              <span style={{ color: "#FF5252" }}>in 30 Minutes.</span>
             </h1>
-            <p style={{ fontSize: 17, color: "#E0E0E0", lineHeight: 1.65, margin: "0 0 24px", maxWidth: 520 }}>
-              Tell us your team size, budget, and date. Get curated venue options, packages, and pricing — without chasing a single vendor.
+            <p style={{ fontSize: 17, color: "#E0E0E0", lineHeight: 1.65, margin: "0 0 20px", maxWidth: 540 }}>
+              Tell us your event requirement. We’ll shortlist suitable venues, packages &amp; pricing for you.
             </p>
-            <div className="hero-badges" style={{ display: "flex", gap: 20, marginTop: 8, alignItems: "center", flexWrap: "wrap" }}>
-              {[
-                { label: "500+ Brands", icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> },
-                { label: "30-Min Turnaround", icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> },
-                { label: "100% Free", icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> },
-                { label: "WhatsApp Support", icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 1 1-7.6-10.6 8.38 8.38 0 0 1 3.9.9L22 4z"></path></svg> },
-              ].map((item, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", color: "#E0E0E0", fontSize: 13, fontWeight: 600, whiteSpace: "nowrap" }}>
-                  <span style={{ color: "#FF5252", display: "flex", alignItems: "center" }}>{item.icon}</span>
-                  {item.label}
-                </div>
+            
+            {/* Occasions List (Clean natural text, not card-like) */}
+            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "6px 12px", margin: "0 0 16px", fontSize: 15, color: "#E2E8F0", fontWeight: 600, letterSpacing: "0.2px" }}>
+              {["Annual Day", "Team Offsite", "Diwali Party", "Family Day", "R&R"].map((occ, i, arr) => (
+                <span key={occ} style={{ display: "inline-flex", alignItems: "center", gap: 12 }}>
+                  <span>{occ}</span>
+                  {i < arr.length - 1 && <span style={{ color: "#FF5252", fontSize: 13, opacity: 0.9 }}>•</span>}
+                </span>
               ))}
+            </div>
+
+            {/* Stats Line (Clean natural inline text with dividers, not card-like) */}
+            <div style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 16,
+              margin: "0 0 24px",
+              flexWrap: "wrap",
+              color: "#fff",
+              fontSize: 14.5,
+              fontWeight: 700,
+              letterSpacing: "0.2px"
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF5252" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-3M9 9h1M9 13h1M9 17h1"/></svg>
+                <span>1000+ Venues</span>
+              </div>
+              <span style={{ color: "rgba(255, 255, 255, 0.4)", fontWeight: 400 }}>|</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF5252" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                <span>500+ Brands</span>
+              </div>
+              <span style={{ color: "rgba(255, 255, 255, 0.4)", fontWeight: 400 }}>|</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF5252" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg>
+                <span>One Point of Contact</span>
+              </div>
+            </div>
+
+            {/* Left CTA Action */}
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8 }}>
+              <button
+                type="button"
+                onClick={() => {
+                  const formEl = document.getElementById('hero-form');
+                  if (formEl) {
+                    formEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    const occasionEl = document.getElementById('hero-occasion') as HTMLSelectElement | null;
+                    if (occasionEl) {
+                      occasionEl.focus();
+                      try {
+                        if (typeof (occasionEl as any).showPicker === 'function') (occasionEl as any).showPicker();
+                      } catch {}
+                    }
+                  }
+                }}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 10,
+                  background: R,
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 9,
+                  padding: "13px 24px",
+                  fontSize: 14,
+                  fontWeight: 800,
+                  letterSpacing: "0.3px",
+                  cursor: "pointer",
+                  boxShadow: "0 6px 18px rgba(128, 40, 31, 0.35)",
+                  transition: "all 0.2s ease",
+                  fontFamily: "var(--font-dm-sans), sans-serif"
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow = "0 8px 22px rgba(128, 40, 31, 0.45)";
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = "none";
+                  e.currentTarget.style.boxShadow = "0 6px 18px rgba(128, 40, 31, 0.35)";
+                }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                </svg>
+                <span>GET 5 FREE QUOTES ON WHATSAPP →</span>
+              </button>
+              <div style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.8)", fontStyle: "italic", paddingLeft: 2 }}>
+                Free for HR &amp; Admin teams • Takes 60 seconds • No obligation
+              </div>
             </div>
           </div>
           {/* Form */}
-          <div id="hero-form" className="hero-form-card" style={{ flex: "1 1 360px", background: "#fff", borderRadius: 14, padding: "22px 20px", boxShadow: "0 24px 48px rgba(0,0,0,0.15)" }}>
-             {/* Step indicator */}
-             {formStatus !== 'success' && (
-               <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 14 }}>
-                 {[1, 2].map(s => (
-                   <div key={s} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                     <div style={{ width: 22, height: 22, borderRadius: "50%", background: formStep >= s ? R : B, color: formStep >= s ? "#fff" : G, fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.3s" }}>{s}</div>
-                     <span style={{ fontSize: 11, fontWeight: 600, color: formStep >= s ? D : G }}>{s === 1 ? "Venue Details" : "Your Contact"}</span>
-                     {s === 1 && <div style={{ width: 28, height: 1, background: formStep === 2 ? R : B, marginLeft: 2, transition: "background 0.3s" }} />}
-                   </div>
-                 ))}
-               </div>
-             )}
+          <div id="hero-form" className="hero-form-card" style={{ position: "relative", zIndex: 10, flex: "1 1 360px", background: "#fff", borderRadius: 14, padding: "22px 20px", boxShadow: "0 24px 48px rgba(0,0,0,0.15)" }}>
 
             {formStatus === 'success' ? (
               <div style={{ textAlign: "center", padding: "28px 0" }}>
@@ -993,352 +1337,323 @@ export default function BMCPLanding() {
                   <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#16A34A" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 </div>
                 <h3 style={{ margin: "0 0 8px", fontSize: 19, fontWeight: 700, color: D }}>Request Received!</h3>
-                <p style={{ fontSize: 13.5, color: G, lineHeight: 1.6, margin: "0 0 22px" }}>{formMsg}</p>
-                <button onClick={() => { setFormStatus('idle'); setFormStep(1); }} style={{ background: "none", color: R, border: `1px solid ${R}`, borderRadius: 8, padding: "10px 24px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Submit Another</button>
+                <p style={{ fontSize: 13.5, color: G, lineHeight: 1.6, margin: "0 0 22px" }}>{formMsg || "Thank you! Our corporate party expert will reach out within 30 minutes with curated options."}</p>
+                <button onClick={() => { setFormStatus('idle'); }} style={{ background: "none", color: R, border: `1px solid ${R}`, borderRadius: 8, padding: "10px 24px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Submit Another</button>
               </div>
-
-            ) : formStep === 1 ? (
-              /* ── STEP 1: Venue-specific details ── */
-              <form key="step1-form" onSubmit={handleStep1}>
-                <h3 style={{ margin: "0 0 2px", fontSize: 17, fontWeight: 700, color: D }}>Get Venue Options Free</h3>
-                <p style={{ margin: "0 0 14px", fontSize: 12, color: G }}>Free for HR & Admin teams. Options within 30 minutes.</p>
-
-                {/* Venue type */}
-                <div style={{ marginBottom: 10 }}>
-                  <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>What u want to book? *</label>
-                  <select required value={formData.formType} onChange={e => setFormData({ ...formData, formType: e.target.value as FormType })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif", background: "#fff", color: formData.formType ? D : G, appearance: "none", backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center", cursor: "pointer" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B}>
-                    <option value="" disabled>Select venue type</option>
-                    <option value="villa">Villa / Resort</option>
-                    <option value="lounge">Lounge</option>
-                    <option value="nightclub">Night Club</option>
-                    <option value="banquet">Banquet</option>
-                    <option value="catering">Catering</option>
-                  </select>
-                </div>
-
-                {formData.formType !== "" && (
-                  <div className="reveal-section">
-                    {/* ──── VILLA / RESORT ──── */}
-                    {formData.formType === 'villa' && (
-                      <>
-                        <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-                          <div style={{ flex: 1 }}>
-                            <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Check-In *</label>
-                            <input required type="date" value={formData.checkInDate} onChange={e => setFormData({ ...formData, checkInDate: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif", color: formData.checkInDate ? D : "#888", cursor: "pointer" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                          </div>
-                          <div style={{ flex: 1 }}>
-                            <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Check-Out *</label>
-                            <input required type="date" value={formData.checkOutDate} onChange={e => setFormData({ ...formData, checkOutDate: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif", color: formData.checkOutDate ? D : "#888", cursor: "pointer" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                          </div>
-                        </div>
-
-                        <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-                          <div style={{ flex: 1 }}>
-                            <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Total Pax *</label>
-                            <input required type="number" min="20" placeholder="e.g. 8" value={formData.totalPax} onChange={e => setFormData({ ...formData, totalPax: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                            {formData.totalPax && parseInt(formData.totalPax, 10) < 20 && (
-                              <span style={{ display: "block", color: "#DC2626", fontSize: 10, fontWeight: 600, marginTop: 4 }}>⚠️ Minimum 20 pax required</span>
-                            )}
-                          </div>
-                          <div style={{ flex: 1 }}>
-                            <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Total Kids *</label>
-                            <input type="number" min="0" placeholder="0" value={formData.totalKids} onChange={e => setFormData({ ...formData, totalKids: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                          </div>
-                        </div>
-
-                        <div style={{ marginBottom: 10 }}>
-                          <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 6 }}>Food *</label>
-                          <div style={{ display: "flex", gap: 6 }}>
-                            {['Veg', 'Non-Veg', 'Pure Veg'].map(opt => {
-                              const sel = formData.food === opt;
-                              return (
-                                <label key={opt} style={{ flex: 1, textAlign: "center", padding: "8px 4px", border: `1px solid ${sel ? R : B}`, borderRadius: 7, fontSize: 12, fontWeight: 600, color: sel ? R : D, background: sel ? L : "#fff", cursor: "pointer" }}>
-                                  <input type="radio" name="food" value={opt} checked={sel} onChange={e => setFormData({ ...formData, food: e.target.value })} style={{ display: "none" }} />
-                                  {opt}
-                                </label>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      </>
-                    )}
-
-                    {/* ──── LOUNGE / NIGHT CLUB ──── */}
-                    {(formData.formType === 'lounge' || formData.formType === 'nightclub') && (
-                      <>
-                        <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-                          <div style={{ flex: 1 }}>
-                            <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Date *</label>
-                            <input required type="date" value={formData.date} onChange={e => setFormData({ ...formData, date: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif", color: formData.date ? D : "#888", cursor: "pointer" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                          </div>
-                          <div style={{ flex: 1 }}>
-                            <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Day</label>
-                            <input readOnly value={dayFromDate(formData.date)} placeholder="—" style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif", background: "#F9FAFB", color: G }} />
-                          </div>
-                        </div>
-
-                        <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-                          <div style={{ flex: 1 }}>
-                            <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>No. of People (Min 20) *</label>
-                            <input required type="number" min="20" placeholder="e.g. 25 (Min 20)" value={formData.noOfPeople} onChange={e => setFormData({ ...formData, noOfPeople: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                            {formData.noOfPeople && parseInt(formData.noOfPeople, 10) < 20 && (
-                              <span style={{ display: "block", color: "#DC2626", fontSize: 10, fontWeight: 600, marginTop: 4 }}>⚠️ Minimum 20 pax required</span>
-                            )}
-                          </div>
-                          <div style={{ flex: 1 }}>
-                            <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Location *</label>
-                            <input required type="text" placeholder="e.g. Andheri West" value={formData.location} onChange={e => setFormData({ ...formData, location: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                          </div>
-                        </div>
-
-                        <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-                          <div style={{ flex: 1 }}>
-                            <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Budget (Food) ₹ *</label>
-                            <input required type="number" min="0" placeholder="1500–1800" value={formData.budgetOnlyFood} onChange={e => setFormData({ ...formData, budgetOnlyFood: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                          </div>
-                          <div style={{ flex: 1 }}>
-                            <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Budget (Drinks) ₹ *</label>
-                            <input required type="number" min="0" placeholder="2500+" value={formData.budgetWithDrinks} onChange={e => setFormData({ ...formData, budgetWithDrinks: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                          </div>
-                        </div>
-
-                        <div style={{ marginBottom: 10 }}>
-                          <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 6 }}>Type of Meal *</label>
-                          <div style={{ display: "flex", gap: 6 }}>
-                            {['Lunch', 'Dinner'].map(opt => {
-                              const sel = formData.typeOfMeal === opt;
-                              return (
-                                <label key={opt} style={{ flex: 1, textAlign: "center", padding: "8px 4px", border: `1px solid ${sel ? R : B}`, borderRadius: 7, fontSize: 12, fontWeight: 600, color: sel ? R : D, background: sel ? L : "#fff", cursor: "pointer" }}>
-                                  <input type="radio" name="meal" value={opt} checked={sel} onChange={e => setFormData({ ...formData, typeOfMeal: e.target.value })} style={{ display: "none" }} />
-                                  {opt}
-                                </label>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      </>
-                    )}
-
-                    {/* ──── BANQUET / CATERING ──── */}
-                    {(formData.formType === 'banquet' || formData.formType === 'catering') && (
-                      <>
-                        <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-                          <div style={{ flex: 1 }}>
-                            <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Date *</label>
-                            <input required type="date" value={formData.date} onChange={e => setFormData({ ...formData, date: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif", color: formData.date ? D : "#888", cursor: "pointer" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                          </div>
-                          <div style={{ flex: 1 }}>
-                            <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Day</label>
-                            <input readOnly value={dayFromDate(formData.date)} placeholder="—" style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif", background: "#F9FAFB", color: G }} />
-                          </div>
-                        </div>
-
-                        <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-                          <div style={{ flex: 1 }}>
-                            <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>No. of People (Min 20) *</label>
-                            <input required type="number" min="20" placeholder="e.g. 100 (Min 20)" value={formData.noOfPeople} onChange={e => setFormData({ ...formData, noOfPeople: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                            {formData.noOfPeople && parseInt(formData.noOfPeople, 10) < 20 && (
-                              <span style={{ display: "block", color: "#DC2626", fontSize: 10, fontWeight: 600, marginTop: 4 }}>⚠️ Minimum 20 pax required</span>
-                            )}
-                          </div>
-                          <div style={{ flex: 1 }}>
-                            <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Location *</label>
-                            <input required type="text" placeholder="e.g. Andheri West" value={formData.location} onChange={e => setFormData({ ...formData, location: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                          </div>
-                        </div>
-
-                        <div style={{ marginBottom: 10 }}>
-                          <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 6 }}>Food Type *</label>
-                          <div style={{ display: "flex", gap: 6 }}>
-                            {['Veg', 'Non-Veg', 'Pure Veg'].map(opt => {
-                              const sel = formData.foodType === opt;
-                              return (
-                                <label key={opt} style={{ flex: 1, textAlign: "center", padding: "8px 4px", border: `1px solid ${sel ? R : B}`, borderRadius: 7, fontSize: 12, fontWeight: 600, color: sel ? R : D, background: sel ? L : "#fff", cursor: "pointer" }}>
-                                  <input type="radio" name="foodType" value={opt} checked={sel} onChange={e => setFormData({ ...formData, foodType: e.target.value })} style={{ display: "none" }} />
-                                  {opt}
-                                </label>
-                              );
-                            })}
-                          </div>
-                        </div>
-
-                        <div style={{ marginBottom: 10 }}>
-                          <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Budget ₹ *</label>
-                          <input required type="number" min="0" placeholder="e.g. 80000" value={formData.budget} onChange={e => setFormData({ ...formData, budget: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                        </div>
-                      </>
-                    )}
-                  </div>
-                )}
-
-                <button type="submit" disabled={!isStep2Valid()} style={{ width: "100%", padding: "11px 0", background: isStep2Valid() ? R : "#F3F4F6", color: isStep2Valid() ? "#fff" : "#9CA3AF", border: isStep2Valid() ? "none" : "1px solid #E5E7EB", borderRadius: 8, fontSize: 14, fontWeight: 700, cursor: isStep2Valid() ? "pointer" : "not-allowed", fontFamily: "var(--font-dm-sans), sans-serif", boxShadow: isStep2Valid() ? "0 4px 14px rgba(192,57,43,0.2)" : "none", marginTop: 4 }}>
-                  NEXT →
-                </button>
-                <p style={{ fontSize: 10, color: "#999", textAlign: "center", margin: "6px 0 0" }}>Free service · No spam · No obligations</p>
-              </form>
-
             ) : (
-              /* ── STEP 2: Contact details ── */
-              <form key="step2-form" onSubmit={handleSubmit}>
-                <h3 style={{ margin: "0 0 2px", fontSize: 17, fontWeight: 700, color: D }}>Almost there!</h3>
-                <p style={{ margin: "0 0 4px", fontSize: 12, color: G }}>Please share the details of your booking.</p>
+              <form key="hero-form" onSubmit={handleSubmit}>
+                <h3 style={{ margin: "0 0 4px", fontSize: 18, fontWeight: 700, color: D, fontFamily: "var(--font-playfair), serif" }}>
+                  Get Venue Options Free
+                </h3>
+                <p style={{ margin: "0 0 16px", fontSize: 12, color: G }}>
+                  Free for HR &amp; Admin teams. Options within 30 minutes.
+                </p>
 
-                {/* Summary pill showing venue details */}
-                <div style={{ background: L, border: `1px solid ${B}`, borderRadius: 8, padding: "8px 12px", marginBottom: 14, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div style={{ display: "flex", flexDirection: "column" }}>
-                    <span style={{ fontSize: 12, color: D, fontWeight: 700 }}>📍 {formData.formType ? VENUE_LABEL[formData.formType] : ''}</span>
-                    <span style={{ fontSize: 10, color: G }}>
-                      {formData.formType === 'villa' 
-                        ? `${formData.checkInDate ? formatDate(formData.checkInDate) : ''} to ${formData.checkOutDate ? formatDate(formData.checkOutDate) : ''} · ${formData.totalPax || 0} Pax`
-                        : `${formData.date ? formatDate(formData.date) : ''} · ${formData.noOfPeople || 0} Pax`
+                {/* 1. What u want to book? */}
+                <div style={{ marginBottom: 12 }}>
+                  <label
+                    htmlFor="hero-occasion"
+                    onClick={() => {
+                      const sel = document.getElementById('hero-occasion') as HTMLSelectElement | null;
+                      if (sel) {
+                        sel.focus();
+                        try {
+                          if (typeof (sel as any).showPicker === 'function') (sel as any).showPicker();
+                        } catch {}
                       }
-                    </span>
-                  </div>
-                  <button 
-                    type="button" 
-                    onClick={(e) => { 
-                      e.preventDefault(); 
-                      e.stopPropagation(); 
-                      setFormStep(1); 
-                    }} 
-                    style={{ 
-                      background: "none", 
-                      border: "none", 
-                      color: R, 
-                      fontSize: 11, 
-                      fontWeight: 700, 
-                      cursor: "pointer", 
-                      padding: "6px 10px", 
-                      position: "relative", 
-                      zIndex: 10 
                     }}
+                    style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4, cursor: "pointer" }}
                   >
-                    Edit
-                  </button>
-                </div>
-
-                <div style={{ marginBottom: 10 }}>
-                  <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Your Name *</label>
-                  <input required type="text" placeholder="e.g. Priya Sharma" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                </div>
-
-                <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-                  {/* Email (First) */}
-                  <div style={{ flex: 1 }}>
-                    <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>Email *</label>
-                    <input required type="email" placeholder="you@company.com" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
+                    What u want to book? *
+                  </label>
+                  <div style={{ position: "relative", width: "100%" }}>
+                    <select
+                      id="hero-occasion"
+                      required
+                      value={formData.occasion}
+                      onChange={e => setFormData({ ...formData, occasion: e.target.value })}
+                      style={{
+                        width: "100%",
+                        padding: "10px 36px 10px 12px",
+                        border: `1px solid ${formData.occasion ? R : B}`,
+                        borderRadius: 7,
+                        fontSize: 13,
+                        outline: "none",
+                        boxSizing: "border-box",
+                        fontFamily: "var(--font-dm-sans), sans-serif",
+                        background: "#fff",
+                        color: formData.occasion ? D : "#9CA3AF",
+                        WebkitAppearance: "none",
+                        MozAppearance: "none",
+                        appearance: "none",
+                        cursor: "pointer",
+                        position: "relative",
+                        zIndex: 2,
+                        transition: "border-color 0.2s"
+                      }}
+                      onFocus={e => e.target.style.borderColor = R}
+                      onBlur={e => e.target.style.borderColor = formData.occasion ? R : B}
+                    >
+                      <option value="" disabled hidden>Select venue type</option>
+                      {OCCASIONS.map((occ) => (
+                        <option key={occ} value={occ} style={{ color: D }}>{occ}</option>
+                      ))}
+                    </select>
+                    <div style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", zIndex: 3, display: "flex", alignItems: "center", color: "#6B7280" }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
                   </div>
+                </div>
 
-                  {/* WhatsApp Number (Second) */}
-                  <div style={{ flex: 1 }}>
-                    <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>WhatsApp Number *</label>
-                    <div style={{ display: "flex", gap: 6 }}>
-                      <input required type="tel" placeholder="e.g. 9876543210" value={formData.whatsappNumber} onChange={e => {
+                {/* 2. NAME */}
+                <div style={{ marginBottom: 12 }}>
+                  <label htmlFor="hero-name" style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>
+                    Name *
+                  </label>
+                  <input
+                    id="hero-name"
+                    required
+                    type="text"
+                    placeholder="e.g. Priya Sharma"
+                    value={formData.name}
+                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                    style={{
+                      width: "100%",
+                      padding: "9px 12px",
+                      border: `1px solid ${B}`,
+                      borderRadius: 7,
+                      fontSize: 13,
+                      outline: "none",
+                      boxSizing: "border-box",
+                      fontFamily: "var(--font-dm-sans), sans-serif",
+                      transition: "border-color 0.2s"
+                    }}
+                    onFocus={e => e.target.style.borderColor = R}
+                    onBlur={e => e.target.style.borderColor = B}
+                  />
+                </div>
+
+                {/* 3. EMAIL */}
+                <div style={{ marginBottom: 12 }}>
+                  <label htmlFor="hero-email" style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>
+                    Email *
+                  </label>
+                  <input
+                    id="hero-email"
+                    required
+                    type="email"
+                    placeholder="you@company.com"
+                    value={formData.email}
+                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                    style={{
+                      width: "100%",
+                      padding: "9px 12px",
+                      border: `1px solid ${B}`,
+                      borderRadius: 7,
+                      fontSize: 13,
+                      outline: "none",
+                      boxSizing: "border-box",
+                      fontFamily: "var(--font-dm-sans), sans-serif",
+                      transition: "border-color 0.2s"
+                    }}
+                    onFocus={e => e.target.style.borderColor = R}
+                    onBlur={e => e.target.style.borderColor = B}
+                  />
+                </div>
+
+                {/* 4. NUMBER (WhatsApp / Phone) */}
+                <div style={{ marginBottom: 12 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4, minHeight: 14 }}>
+                    <label htmlFor="hero-phone" style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, lineHeight: "14px" }}>
+                      Number *
+                    </label>
+                  </div>
+                  <div style={{ display: "flex", gap: 8, alignItems: "stretch" }}>
+                    <input
+                      id="hero-phone"
+                      required
+                      type="tel"
+                      placeholder="e.g. 9876543210"
+                      value={formData.whatsappNumber}
+                      onChange={e => {
                         setFormData({ ...formData, whatsappNumber: e.target.value });
                         setOtpSent(false);
                         setOtpVerified(false);
                         setOtpCode('');
                         setOtpError('');
-                      }} style={{ flex: 1, padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B} />
-                      <button type="button" onClick={handleSendOtp} disabled={!isValidPhone(formData.whatsappNumber) || otpSent || otpLoading} style={{ background: (isValidPhone(formData.whatsappNumber) && !otpSent && !otpLoading) ? R : "#F3F4F6", color: (isValidPhone(formData.whatsappNumber) && !otpSent && !otpLoading) ? "#fff" : "#9CA3AF", border: `1px solid ${(isValidPhone(formData.whatsappNumber) && !otpSent && !otpLoading) ? R : "#E5E7EB"}`, borderRadius: 7, padding: "0 12px", fontSize: 11, fontWeight: 700, cursor: (isValidPhone(formData.whatsappNumber) && !otpSent && !otpLoading) ? "pointer" : "not-allowed", transition: "all 0.2s" }}>
-                        {otpLoading ? "Sending..." : otpSent ? "Sent" : "OTP"}
-                      </button>
-                    </div>
-
-                    {/* OTP controls inside WhatsApp column */}
-                    {otpSent && (
-                      <div style={{ marginTop: 8, display: "flex", gap: 6, alignItems: "center" }}>
-                        <input 
-                          type="text" 
-                          maxLength={6} 
-                          placeholder="Enter OTP Code" 
-                          value={otpCode} 
-                          onChange={e => setOtpCode(e.target.value)} 
-                          style={{ 
-                            flex: 1, 
-                            padding: "8px 10px", 
-                            border: `1px solid ${B}`, 
-                            borderRadius: 7, 
-                            fontSize: 12, 
-                            outline: "none", 
-                            boxSizing: "border-box", 
-                            fontFamily: "var(--font-dm-sans), sans-serif" 
-                          }} 
-                          onFocus={e => e.target.style.borderColor = R} 
-                          onBlur={e => e.target.style.borderColor = B}
-                        />
-                        <button 
-                          type="button" 
-                          onClick={() => handleVerifyOtp()} 
-                          disabled={otpVerified || !otpCode || otpVerifying} 
-                          style={{ 
-                            background: (otpVerified || !otpCode || otpVerifying) ? "#F3F4F6" : "#16A34A", 
-                            color: (otpVerified || !otpCode || otpVerifying) ? "#9CA3AF" : "#fff", 
-                            border: `1px solid ${(otpVerified || !otpCode || otpVerifying) ? "#E5E7EB" : "#16A34A"}`, 
-                            borderRadius: 7, 
-                            padding: "8px 12px", 
-                            fontSize: 11, 
-                            fontWeight: 700, 
-                            cursor: (otpVerified || !otpCode || otpVerifying) ? "default" : "pointer",
-                            transition: "all 0.2s"
-                          }}
-                        >
-                          {otpVerifying ? "..." : otpVerified ? "✓" : "Verify"}
-                        </button>
-                        <button 
-                          type="button" 
-                          onClick={handleSendOtp} 
-                          disabled={otpLoading}
-                          style={{ 
-                            background: "none", 
-                            border: "none", 
-                            color: R, 
-                            fontSize: 10, 
-                            fontWeight: 600, 
-                            cursor: otpLoading ? "not-allowed" : "pointer", 
-                            padding: 0,
-                            textDecoration: "underline",
-                            whiteSpace: "nowrap"
-                          }}
-                        >
-                          Resend
-                        </button>
-                      </div>
-                    )}
-                    {otpError && (
-                      <span style={{ display: "block", color: "#DC2626", fontSize: 10, fontWeight: 600, marginTop: 4 }}>{otpError}</span>
-                    )}
-                    {otpVerified && (
-                      <span style={{ display: "block", color: "#16A34A", fontSize: 10, fontWeight: 600, marginTop: 4 }}>✓ Phone Verified</span>
-                    )}
+                      }}
+                      style={{
+                        flex: 1,
+                        minWidth: 0,
+                        height: 40,
+                        padding: "9px 12px",
+                        border: `1px solid ${B}`,
+                        borderRadius: 7,
+                        fontSize: 13,
+                        outline: "none",
+                        boxSizing: "border-box",
+                        fontFamily: "var(--font-dm-sans), sans-serif",
+                        transition: "border-color 0.2s"
+                      }}
+                      onFocus={e => e.target.style.borderColor = R}
+                      onBlur={e => e.target.style.borderColor = B}
+                    />
+                    <button
+                      type="button"
+                      id="hero-send-otp-btn"
+                      onClick={handleSendOtp}
+                      disabled={!isValidPhone(formData.whatsappNumber) || otpSent || otpLoading}
+                      style={{
+                        width: 96,
+                        minWidth: 96,
+                        maxWidth: 96,
+                        flexShrink: 0,
+                        height: 40,
+                        background: (isValidPhone(formData.whatsappNumber) && !otpSent && !otpLoading) ? R : "#F3F4F6",
+                        color: (isValidPhone(formData.whatsappNumber) && !otpSent && !otpLoading) ? "#fff" : "#9CA3AF",
+                        border: `1px solid ${(isValidPhone(formData.whatsappNumber) && !otpSent && !otpLoading) ? R : "#E5E7EB"}`,
+                        borderRadius: 7,
+                        padding: 0,
+                        fontSize: 12,
+                        fontWeight: 700,
+                        cursor: (isValidPhone(formData.whatsappNumber) && !otpSent && !otpLoading) ? "pointer" : "not-allowed",
+                        transition: "all 0.2s",
+                        whiteSpace: "nowrap",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        boxSizing: "border-box"
+                      }}
+                    >
+                      {otpLoading ? "Sending..." : otpSent ? "Sent ✓" : "Send OTP"}
+                    </button>
                   </div>
                 </div>
 
+                {/* 5. OTP */}
                 <div style={{ marginBottom: 12 }}>
-                  <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, marginBottom: 4 }}>How did you hear about us? *</label>
-                  <select required value={formData.source} onChange={e => setFormData({ ...formData, source: e.target.value })} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${B}`, borderRadius: 7, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "var(--font-dm-sans), sans-serif", background: "#fff", color: formData.source ? D : G, appearance: "none", backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center", cursor: "pointer" }} onFocus={e => e.target.style.borderColor = R} onBlur={e => e.target.style.borderColor = B}>
-                    <option value="" disabled>Select source</option>
-                    {SOURCE_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
-                  </select>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4, minHeight: 14 }}>
+                    <label htmlFor="hero-otp" style={{ display: "block", fontSize: 11, fontWeight: 600, color: D, lineHeight: "14px" }}>
+                      OTP *
+                    </label>
+                    {otpSent && !otpVerified && (
+                      <button
+                        type="button"
+                        onClick={handleSendOtp}
+                        disabled={otpLoading}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          color: R,
+                          fontSize: 10.5,
+                          fontWeight: 600,
+                          cursor: otpLoading ? "not-allowed" : "pointer",
+                          padding: 0,
+                          textDecoration: "underline",
+                          lineHeight: "14px"
+                        }}
+                      >
+                        Resend OTP
+                      </button>
+                    )}
+                  </div>
+                  <div style={{ display: "flex", gap: 8, alignItems: "stretch" }}>
+                    <input
+                      id="hero-otp"
+                      type="text"
+                      maxLength={6}
+                      placeholder={otpSent ? "Enter 6-digit OTP" : "Enter number & click Send OTP"}
+                      value={otpCode}
+                      onChange={e => setOtpCode(e.target.value)}
+                      disabled={otpVerified}
+                      style={{
+                        flex: 1,
+                        minWidth: 0,
+                        height: 40,
+                        padding: "9px 12px",
+                        border: `1px solid ${otpVerified ? "#16A34A" : B}`,
+                        borderRadius: 7,
+                        fontSize: 13,
+                        outline: "none",
+                        boxSizing: "border-box",
+                        fontFamily: "var(--font-dm-sans), sans-serif",
+                        background: otpVerified ? "#F0FDF4" : "#fff",
+                        color: otpVerified ? "#166534" : D,
+                        transition: "border-color 0.2s"
+                      }}
+                      onFocus={e => e.target.style.borderColor = otpVerified ? "#16A34A" : R}
+                      onBlur={e => e.target.style.borderColor = otpVerified ? "#16A34A" : B}
+                    />
+                    <button
+                      type="button"
+                      id="hero-verify-otp-btn"
+                      onClick={() => handleVerifyOtp()}
+                      disabled={otpVerified || !otpCode || otpVerifying}
+                      style={{
+                        width: 96,
+                        minWidth: 96,
+                        maxWidth: 96,
+                        flexShrink: 0,
+                        height: 40,
+                        background: otpVerified ? "#16A34A" : (!otpCode || otpVerifying) ? "#F3F4F6" : "#16A34A",
+                        color: (otpVerified || (otpCode && !otpVerifying)) ? "#fff" : "#9CA3AF",
+                        border: `1px solid ${(otpVerified || otpCode) ? "#16A34A" : "#E5E7EB"}`,
+                        borderRadius: 7,
+                        padding: 0,
+                        fontSize: 12,
+                        fontWeight: 700,
+                        cursor: (otpVerified || !otpCode || otpVerifying) ? "default" : "pointer",
+                        transition: "all 0.2s",
+                        whiteSpace: "nowrap",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        boxSizing: "border-box"
+                      }}
+                    >
+                      {otpVerifying ? "..." : otpVerified ? "Verified ✓" : "Verify"}
+                    </button>
+                  </div>
+                  {otpError && (
+                    <span style={{ display: "block", color: "#DC2626", fontSize: 11, fontWeight: 600, marginTop: 4 }}>{otpError}</span>
+                  )}
+                  {otpVerified && (
+                    <span style={{ display: "block", color: "#16A34A", fontSize: 11, fontWeight: 600, marginTop: 4 }}>✓ Phone Verified</span>
+                  )}
                 </div>
-
-                {formData.formType === 'villa' && (
-                  <label style={{ display: "flex", gap: 10, alignItems: "flex-start", fontSize: 12, color: D, marginBottom: 12, cursor: "pointer", background: L, border: `1px solid ${B}`, borderRadius: 8, padding: "10px 12px" }}>
-                    <input type="checkbox" checked={formData.pricingAccepted} onChange={e => setFormData({ ...formData, pricingAccepted: e.target.checked })} style={{ accentColor: R, marginTop: 3, flexShrink: 0, cursor: "pointer" }} />
-                    <span style={{ lineHeight: 1.5 }}>
-                      A decent villa typically costs around <strong>₹40,000</strong> for a one-night stay for 4BHK (8 adults). Food expenses are approximately <strong>₹2,500 per person</strong> for all meals. Would you like to go ahead with this pricing?
-                    </span>
-                  </label>
-                )}
 
                 {formStatus === 'error' && (
                   <p style={{ fontSize: 12, color: "#DC2626", background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 6, padding: "9px 12px", margin: "0 0 10px" }}>{formMsg}</p>
                 )}
 
-                <button type="submit" disabled={formStatus === 'submitting' || !isStep1Valid()} style={{ width: "100%", padding: "11px 0", background: (formStatus === 'submitting' || !isStep1Valid()) ? "#F3F4F6" : R, color: (formStatus === 'submitting' || !isStep1Valid()) ? "#9CA3AF" : "#fff", border: (formStatus === 'submitting' || !isStep1Valid()) ? "1px solid #E5E7EB" : "none", borderRadius: 8, fontSize: 14, fontWeight: 700, cursor: (formStatus === 'submitting' || !isStep1Valid()) ? "not-allowed" : "pointer", fontFamily: "var(--font-dm-sans), sans-serif", boxShadow: (formStatus === 'submitting' || !isStep1Valid()) ? "none" : "0 4px 14px rgba(192,57,43,0.2)" }}>
-                  {formStatus === 'submitting' ? 'Sending...' : 'GET VENUE OPTIONS FREE →'}
+                {/* 6. SUBMIT */}
+                <button
+                  type="submit"
+                  id="hero-submit-btn"
+                  disabled={formStatus === 'submitting' || !isFormValid()}
+                  style={{
+                    width: "100%",
+                    padding: "12px 14px",
+                    background: (formStatus === 'submitting' || !isFormValid()) ? "#F3F4F6" : R,
+                    color: (formStatus === 'submitting' || !isFormValid()) ? "#9CA3AF" : "#fff",
+                    border: (formStatus === 'submitting' || !isFormValid()) ? "1px solid #E5E7EB" : "none",
+                    borderRadius: 8,
+                    fontSize: 13.5,
+                    fontWeight: 700,
+                    cursor: (formStatus === 'submitting' || !isFormValid()) ? "not-allowed" : "pointer",
+                    fontFamily: "var(--font-dm-sans), sans-serif",
+                    boxShadow: (formStatus === 'submitting' || !isFormValid()) ? "none" : "0 4px 14px rgba(128,40,31,0.25)",
+                    transition: "all 0.2s"
+                  }}
+                >
+                  {formStatus === 'submitting' ? 'Submitting...' : 'GET 5 FREE QUOTES ON WHATSAPP →'}
                 </button>
-                <p style={{ fontSize: 10, color: "#999", textAlign: "center", margin: "6px 0 0" }}>By clicking, you accept our <Link href="/terms" style={{ color: "#999", textDecoration: "underline" }}>Terms & Conditions</Link></p>
+                <p style={{ fontSize: 11, color: G, fontStyle: "italic", textAlign: "center", margin: "8px 0 4px", fontWeight: 500 }}>
+                  Free for HR &amp; Admin teams • Takes 60 seconds • No obligation
+                </p>
+                <p style={{ fontSize: 10, color: "#999", textAlign: "center", margin: "4px 0 0" }}>
+                  By clicking submit, you accept our <Link href="/terms" style={{ color: "#999", textDecoration: "underline" }}>Terms &amp; Conditions</Link>
+                </p>
               </form>
             )}
           </div>
@@ -1350,18 +1665,24 @@ export default function BMCPLanding() {
 
       {/* ===== 2. WHY CHOOSE US ===== */}
       <Sec bg="#FAFAFA" id="why-us">
-        <div style={{ textAlign: "center", marginBottom: 28 }}>
-          <h2 style={{ fontFamily: "var(--font-playfair), serif", fontSize: 30, margin: "0 0 8px" }}>Why HR Teams Choose <span style={{ color: R }}>BookMyCorporateParty</span></h2>
-          <p style={{ fontSize: 15, color: G, maxWidth: 480, margin: "0 auto" }}>Corporate-only. Curated. Handled end-to-end.</p>
+        <div style={{ textAlign: "center", marginBottom: 30 }}>
+          <h2 style={{ fontFamily: "var(--font-playfair), serif", fontSize: "clamp(26px, 3.5vw, 32px)", margin: "0 0 8px" }}>Why HR and Admin Teams Choose <span style={{ color: R }}>BookMyCorporateParty.com</span></h2>
+          <p style={{ fontSize: 15, color: G, maxWidth: 520, margin: "0 auto" }}>Corporate-only. Curated. Handled end-to-end.</p>
         </div>
-        <div className="features-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 20 }}>
+        <div className="features-grid">
           {[
-            { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>, title: "100% Corporate Focus", desc: "Not a wedding or birthday directory. Every venue on our platform is vetted specifically for office events." },
-            { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>, title: "30-Minute Turnaround", desc: "Share your requirements. Get 3–5 handpicked venue options with pricing within 30 minutes." },
-            { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>, title: "Negotiated Corporate Rates", desc: "We negotiate directly with venues so you get better pricing than booking on your own." },
-            { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>, title: "Full Event Coordination", desc: "DJ, food, decor, branding, team-building activities — one point of contact from start to finish." },
+            { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>, title: "Save Time", desc: "We do the venue research for you." },
+            { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" /><line x1="7" y1="7" x2="7.01" y2="7" /></svg>, title: "Save Money", desc: "Access negotiated corporate packages." },
+            { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6" /><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" /></svg>, title: "Reduce Hassle", desc: "One point of contact from enquiry to execution." },
+            { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><polyline points="9 12 11 14 15 10" /></svg>, title: "Choose With Confidence", desc: "Curated and pre-verified venues." },
+            { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /></svg>, title: "Compare Easily", desc: "Pricing, packages, capacity and inclusions in one place." },
+            { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>, title: "Book Faster", desc: "Get shortlisted options quickly." },
+            { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>, title: "Customize Your Event", desc: "Food, drinks, DJ, décor, activities and branding." },
+            { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>, title: "Handle Any Group Size", desc: "From intimate team gatherings to large corporate celebrations." },
+            { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><polyline points="9 15 11 17 15 13" /></svg>, title: "Make Approvals Easier", desc: "Clear proposals and transparent pricing." },
+            { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M8 14s1.5 2 4 2 4-2 4-2" /><line x1="9" y1="9" x2="9.01" y2="9" /><line x1="15" y1="9" x2="15.01" y2="9" /></svg>, title: "Focus on Your Team", desc: "We handle the coordination; you enjoy the event." },
           ].map((b, i) => (
-            <div key={i} style={{ background: "#fff", borderRadius: 14, padding: "24px 16px", border: `1px solid ${B}`, textAlign: "center", transition: "transform 0.2s, box-shadow 0.2s" }} onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-5px)"; e.currentTarget.style.boxShadow = "0 10px 20px rgba(0,0,0,0.05)"; }} onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; }}>
+            <div key={i} style={{ background: "#fff", borderRadius: 14, padding: "24px 16px", border: `1px solid ${B}`, textAlign: "center", transition: "transform 0.2s, box-shadow 0.2s", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-start" }} onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-5px)"; e.currentTarget.style.boxShadow = "0 10px 20px rgba(0,0,0,0.05)"; }} onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; }}>
               <div style={{ color: R, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
                 {b.icon}
               </div>
@@ -1369,6 +1690,33 @@ export default function BMCPLanding() {
               <p style={{ margin: 0, fontSize: 13, color: G, lineHeight: 1.6 }}>{b.desc}</p>
             </div>
           ))}
+        </div>
+
+        {/* The BMCP Proposition Banner */}
+        <div style={{
+          marginTop: 28,
+          background: "#FFFFFF",
+          border: `1px solid ${B}`,
+          borderRadius: 14,
+          padding: "20px 24px",
+          textAlign: "center",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.03)"
+        }}>
+          <p
+            className="bmcp-promise-text"
+            style={{
+              margin: 0,
+              fontFamily: "var(--font-dm-sans), sans-serif",
+              fontSize: "clamp(13px, 1.3vw, 15.5px)",
+              fontWeight: 600,
+              color: D,
+              lineHeight: 1.5,
+              textAlign: "center",
+              width: "100%"
+            }}
+          >
+            You tell us the date, budget and guest count — we find the venue, negotiate the package, and coordinate the event.
+          </p>
         </div>
       </Sec>
 
@@ -1587,8 +1935,108 @@ export default function BMCPLanding() {
         </div>{/* end carousel wrapper */}
       </Sec>
 
+      {/* ===== TOP 10 PROBLEMS HR FACES ===== */}
+      <Sec bg="#FFFFFF" id="hr-problems" style={{ borderTop: `1px solid ${B}` }}>
+        <div style={{ textAlign: "center", marginBottom: 36 }}>
+          <Badge text="The Real HR Struggle" />
+          <h2 style={{ fontFamily: "var(--font-playfair), serif", fontSize: "clamp(28px, 4vw, 36px)", margin: "14px 0 10px", color: D, letterSpacing: "-0.3px" }}>
+            Top 10 Problems HR Faces <span style={{ color: R }}>When Planning Events</span>
+          </h2>
+          <p style={{ fontSize: 15, color: G, maxWidth: 640, margin: "0 auto", lineHeight: 1.6 }}>
+            Planning corporate celebrations sounds exciting until the endless calls, unclear pricing, and vendor chaos begin. Here is what HR teams deal with — and how we eliminate each one.
+          </p>
+        </div>
+
+        <div className="hr-problems-grid">
+          {HR_PROBLEMS.map((item, idx) => (
+            <div
+              key={idx}
+              style={{
+                background: "#fff",
+                borderRadius: 14,
+                border: `1px solid ${B}`,
+                padding: "22px 20px",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                transition: "all 0.25s ease",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.03)"
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.transform = "translateY(-4px)";
+                e.currentTarget.style.boxShadow = "0 12px 28px rgba(128,40,31,0.09)";
+                e.currentTarget.style.borderColor = "rgba(128,40,31,0.3)";
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform = "none";
+                e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.03)";
+                e.currentTarget.style.borderColor = B;
+              }}
+            >
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                  <span style={{
+                    fontSize: 10.5,
+                    fontWeight: 800,
+                    letterSpacing: "0.8px",
+                    color: R,
+                    background: L,
+                    border: "1px solid rgba(128,40,31,0.15)",
+                    padding: "3px 8px",
+                    borderRadius: 6,
+                    textTransform: "uppercase"
+                  }}>
+                    PROBLEM {item.num}
+                  </span>
+                  <div style={{
+                    width: 34,
+                    height: 34,
+                    borderRadius: 8,
+                    background: L,
+                    color: R,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0
+                  }}>
+                    {item.icon}
+                  </div>
+                </div>
+
+                <h3 style={{ margin: "0 0 8px", fontSize: 16.5, fontWeight: 700, color: D, letterSpacing: "-0.2px" }}>
+                  {item.title}
+                </h3>
+                <p style={{ margin: "0 0 14px", fontSize: 13, color: "#4B5563", lineHeight: 1.6 }}>
+                  {item.desc}
+                </p>
+              </div>
+
+              {/* The BMCP Fix */}
+              <div style={{
+                background: "#F8FAFC",
+                border: "1px solid #E2E8F0",
+                borderRadius: 8,
+                padding: "10px 12px",
+                display: "flex",
+                alignItems: "flex-start",
+                gap: 8,
+                marginTop: "auto"
+              }}>
+                <div style={{ color: R, flexShrink: 0, marginTop: 1 }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <p style={{ margin: 0, fontSize: 12, color: "#1E293B", lineHeight: 1.45, fontWeight: 500 }}>
+                  <strong style={{ color: R, fontWeight: 700 }}>The BMCP Fix: </strong>
+                  {item.solution}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Sec>
+
       {/* ===== 5. THE COMPARISON BOARD (WHITE) ===== */}
-      <Sec bg="#fff" id="comparison-board">
+      <Sec bg="#FAFAFA" id="comparison-board">
         <div style={{ textAlign: "center", marginBottom: 30 }}>
           <Badge text="The Comparison" />
           <h2 style={{ fontFamily: "var(--font-playfair), serif", fontSize: 32, margin: "10px 0 0" }}>Why HRs Prefer Our <span style={{ color: R }}>Streamlined</span> Process</h2>
@@ -1673,49 +2121,365 @@ export default function BMCPLanding() {
         </div>
       </Sec>
 
-      {/* ===== 7. COMPARISON TABLE (WHITE) ===== */}
-      <Sec bg="#fff" id="comparison">
-        <div style={{ textAlign: "center", marginBottom: 30 }}>
-          <Badge text="The Choice" />
-          <h2 style={{ fontFamily: "var(--font-playfair), serif", fontSize: 32, margin: "10px 0 0" }}>BookMyCorporateParty vs Others</h2>
+      {/* ===== WHY BMCP SOLUTIONS ===== */}
+      <Sec bg="#FFFFFF" id="solutions" style={{ borderTop: `1px solid ${B}`, padding: "52px clamp(20px, 4vw, 80px)" }}>
+        <div style={{ textAlign: "center", marginBottom: 38 }}>
+          <Badge text="WHY BMCP SOLUTIONS" />
+          <h2 style={{ fontFamily: "var(--font-playfair), serif", fontSize: "clamp(28px, 4vw, 36px)", margin: "14px 0 10px", color: D, letterSpacing: "-0.3px" }}>
+            Why BMCP Solutions <span style={{ color: R }}>Are Built for Companies</span>
+          </h2>
+          <p style={{ fontSize: 15, color: G, maxWidth: 680, margin: "0 auto", lineHeight: 1.6 }}>
+            Designed exclusively for HR, Admin, and Corporate teams. From fast 30-minute shortlists to negotiated packages and full coordination — here is why 500+ companies choose us.
+          </p>
         </div>
-        <div className="table-scroll-wrap" style={{ width: "100%", borderRadius: 16, overflow: "hidden", border: `1px solid ${B}`, boxShadow: "0 10px 40px rgba(0,0,0,0.03)" }}>
-          {/* Header Row */}
-          <div className="table-header-row" style={{ display: "grid", gridTemplateColumns: "1.2fr 1.5fr 1.5fr", background: D, color: "#fff", fontWeight: 800, fontSize: 13, textTransform: "uppercase", letterSpacing: "1px" }}>
-            <div style={{ padding: "20px 24px" }}>Platform Focus</div>
-            <div style={{ padding: "20px 24px", background: "rgba(255,255,255,0.05)", textAlign: "center", color: "#fff" }}>BookMyCorporateParty</div>
-            <div style={{ padding: "20px 24px", textAlign: "center", opacity: 0.6 }}>Other Sites</div>
-          </div>
 
-          {[
-            ["Audience Focus", "100% corporate events", "Weddings, birthdays, everything"],
-            ["Shortlisting Speed", "Options in 30 minutes", "Browse listings yourself for days"],
-            ["Venue Quality", "Handpicked & curated", "Open unverified marketplace"],
-            ["Pricing Control", "Negotiated corporate rates", "Listed rack rates / call to know"],
-            ["End-to-End Support", "DJ, Food, AV — all coordinated", "You coordinate with venue directly"],
-            ["Last-Minute Booking", "Dedicated priority support", "No dedicated support team"],
-            ["Site Inspection", "Arranged & coordinated", "Self-service only"],
-          ].map(([feat, ours, theirs], i) => (
-            <div key={i} className="table-data-row" style={{ display: "grid", gridTemplateColumns: "1.2fr 1.5fr 1.5fr", background: i % 2 === 0 ? "#fff" : "#FAFAFA", borderBottom: i === 6 ? "none" : `1px solid ${B}` }}>
-              <div style={{ padding: "16px 24px", fontWeight: 600, fontSize: 14, color: D, display: "flex", alignItems: "center" }}>{feat}</div>
-
-              {/* Our Column */}
-              <div style={{ padding: "16px 24px", fontSize: 14, color: D, fontWeight: 700, background: "rgba(192,57,43,0.02)", borderLeft: `1px solid ${B}`, borderRight: `1px solid ${B}`, display: "flex", alignItems: "center", gap: 10 }}>
-                <div style={{ color: "#16A34A", flexShrink: 0 }}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        <div className="bmcp-solutions-grid">
+          {BMCP_SOLUTIONS.map((item, idx) => (
+            <div
+              key={idx}
+              style={{
+                background: "#fff",
+                borderRadius: 14,
+                border: `1px solid ${B}`,
+                padding: "24px 22px",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                transition: "all 0.25s ease",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.03)",
+                position: "relative"
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.transform = "translateY(-4px)";
+                e.currentTarget.style.boxShadow = "0 14px 28px rgba(128,40,31,0.09)";
+                e.currentTarget.style.borderColor = "rgba(128,40,31,0.35)";
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform = "none";
+                e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.03)";
+                e.currentTarget.style.borderColor = B;
+              }}
+            >
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                  <span style={{
+                    fontSize: 10.5,
+                    fontWeight: 800,
+                    letterSpacing: "0.8px",
+                    color: R,
+                    background: L,
+                    border: "1px solid rgba(128,40,31,0.15)",
+                    padding: "3px 8px",
+                    borderRadius: 6,
+                    textTransform: "uppercase"
+                  }}>
+                    SOLUTION {item.num}
+                  </span>
+                  <div style={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: 10,
+                    background: L,
+                    color: R,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0
+                  }}>
+                    {item.icon}
+                  </div>
                 </div>
-                {ours}
-              </div>
 
-              {/* Their Column */}
-              <div style={{ padding: "16px 24px", fontSize: 13.5, color: G, display: "flex", alignItems: "center", gap: 10, textAlign: "center" }}>
-                <div style={{ color: "#9CA3AF", flexShrink: 0 }}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
-                </div>
-                {theirs}
+                <h3 style={{ margin: "0 0 10px", fontSize: 16.5, fontWeight: 700, color: D, letterSpacing: "-0.2px", lineHeight: 1.35 }}>
+                  {item.title}
+                </h3>
+                <p style={{ margin: "0 0 16px", fontSize: 13.5, color: "#4B5563", lineHeight: 1.6 }}>
+                  {item.desc}
+                </p>
               </div>
             </div>
           ))}
+        </div>
+      </Sec>
+
+      {/* ===== 7. COMPARISON TABLE (PERFECTED BMCP MATRIX) ===== */}
+      <Sec
+        bg="#FFFFFF"
+        id="comparison"
+        style={{
+          position: "relative",
+          overflow: "hidden",
+          padding: "48px clamp(20px, 4vw, 80px)"
+        }}
+      >
+
+        <div style={{ textAlign: "center", marginBottom: 32, position: "relative", zIndex: 1 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 14, marginBottom: 14, flexWrap: "wrap" }}>
+            <Badge text="The Choice" />
+          </div>
+
+          <h2 style={{ fontFamily: "var(--font-playfair), serif", fontSize: "clamp(28px, 4vw, 36px)", margin: "14px 0 8px", color: D, letterSpacing: "-0.3px" }}>
+            BookMyCorporateParty vs Others
+          </h2>
+          <p style={{ fontSize: 14.5, color: G, margin: 0, fontWeight: 400 }}>
+            Dedicated corporate event intelligence vs generic public listing sites
+          </p>
+        </div>
+
+        {/* Swipe hint for mobile screens */}
+        <div className="matrix-scroll-hint" style={{ display: "none", alignItems: "center", justifyContent: "center", gap: 6, fontSize: 12, color: G, marginBottom: 12 }}>
+          <span>⇄ Swipe horizontally to view all 7 comparison points</span>
+        </div>
+
+        {/* Matrix Card Container */}
+        <div style={{
+          width: "100%",
+          borderRadius: 22,
+          overflow: "hidden",
+          background: "#FFFFFF",
+          border: `1px solid ${B}`,
+          boxShadow: "0 16px 45px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02)",
+          position: "relative",
+          zIndex: 1,
+        }}>
+          {/* Scrollable Container */}
+          <div className="matrix-scroll-wrap" style={{ width: "100%", overflowX: "auto" }}>
+            <div style={{ minWidth: 1220 }}>
+              {/* Header Row: Top-Left Icon + 7 Criteria Columns */}
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "310px repeat(7, 1fr)",
+                background: "#F8FAFC",
+                borderBottom: "1px solid #E2E8F0",
+                alignItems: "stretch"
+              }}>
+                {/* Top-Left Geometric Monogram */}
+                <div style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12,
+                  padding: "18px 24px",
+                  position: "sticky",
+                  left: 0,
+                  zIndex: 4,
+                  background: "#F8FAFC"
+                }}>
+                  <div style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#475569",
+                    flexShrink: 0
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                      <path d="M3 9h18"></path>
+                      <path d="M9 21V9"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: "1.5px", textTransform: "uppercase", color: "#334155" }}>PLATFORM COMPARISON</span>
+                  </div>
+                </div>
+
+                {/* 7 Column Headers */}
+                {[
+                  "AUDIENCE FOCUS",
+                  "SHORTLISTING SPEED",
+                  "VENUE QUALITY",
+                  "PRICING CONTROL",
+                  "END-TO-END SUPPORT",
+                  "LAST-MINUTE BOOKING",
+                  "SITE INSPECTION"
+                ].map((crit, idx) => (
+                  <div key={idx} style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    textAlign: "center",
+                    fontSize: 10.5,
+                    fontWeight: 800,
+                    letterSpacing: "1.2px",
+                    textTransform: "uppercase",
+                    color: "#475569",
+                    padding: "16px 10px",
+                    lineHeight: 1.35,
+                    borderLeft: "1px solid #E2E8F0"
+                  }}>
+                    {crit}
+                  </div>
+                ))}
+              </div>
+
+              {/* ROW 1: BookMyCorporateParty (SEAMLESS PURE BRAND BROWN - NO EXTRA COLOR PATCH) */}
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "310px repeat(7, 1fr)",
+                background: R,
+                color: "#FFFFFF",
+                alignItems: "stretch",
+                borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+                boxShadow: "0 6px 20px rgba(128, 40, 31, 0.16)",
+                position: "relative"
+              }}>
+                {/* Left Provider Block (Seamless Background matching parent 100%) */}
+                <div style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 14,
+                  padding: "24px 24px",
+                  position: "sticky",
+                  left: 0,
+                  zIndex: 3,
+                  background: R
+                }}>
+                  <img
+                    src="/images/logo-icon.png"
+                    alt="BookMyCorporateParty"
+                    style={{ width: 44, height: 44, objectFit: "contain", flexShrink: 0, filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.25))" }}
+                  />
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: "#FFFFFF", letterSpacing: "-0.2px" }}>
+                      BookMyCorporateParty
+                    </h3>
+                    <p style={{ margin: "4px 0 0", fontSize: 11.5, color: "rgba(255, 255, 255, 0.88)", lineHeight: 1.45 }}>
+                      Dedicated corporate event intelligence with handpicked venues &amp; priority coordination.
+                    </p>
+                  </div>
+                </div>
+
+                {/* 7 Columns for BMCP */}
+                {[
+                  "100% corporate events",
+                  "Options in 30 minutes",
+                  "Handpicked & curated",
+                  "Negotiated corporate rates",
+                  "DJ, Food, AV — all coordinated",
+                  "Dedicated priority support",
+                  "Arranged & coordinated"
+                ].map((val, idx) => (
+                  <div key={idx} style={{
+                    textAlign: "center",
+                    padding: "24px 10px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderLeft: "1px solid rgba(255, 255, 255, 0.15)"
+                  }}>
+                    {/* Circled Checkmark (Aneeverse Style) */}
+                    <div style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: "50%",
+                      background: "rgba(255, 255, 255, 0.18)",
+                      border: "1.5px solid rgba(255, 255, 255, 0.85)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "#FFFFFF",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.12)"
+                    }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </div>
+                    <span style={{ fontSize: 12.5, fontWeight: 700, color: "#FFFFFF", marginTop: 10, lineHeight: 1.35, display: "block" }}>
+                      {val}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* ROW 2: Other Sites (COMPETITOR ROW - HIGH CONTRAST & FULLY VISIBLE) */}
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "310px repeat(7, 1fr)",
+                background: "#FFFFFF",
+                alignItems: "stretch"
+              }}>
+                {/* Left Provider Block (Seamless Sticky) */}
+                <div style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 14,
+                  padding: "24px 24px",
+                  position: "sticky",
+                  left: 0,
+                  zIndex: 3,
+                  background: "#FFFFFF"
+                }}>
+                  <div style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#1E293B",
+                    flexShrink: 0,
+                    width: 44,
+                    height: 44
+                  }}>
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="2" y="3" width="20" height="18" rx="3"></rect>
+                      <line x1="2" y1="8" x2="22" y2="8"></line>
+                      <circle cx="5.5" cy="5.5" r="0.75" fill="currentColor"></circle>
+                      <circle cx="8" cy="5.5" r="0.75" fill="currentColor"></circle>
+                      <circle cx="10.5" cy="5.5" r="0.75" fill="currentColor"></circle>
+                      <rect x="5.5" y="11.5" width="4.5" height="4.5" rx="1"></rect>
+                      <line x1="13" y1="12.5" x2="18.5" y2="12.5"></line>
+                      <line x1="13" y1="15" x2="17.5" y2="15"></line>
+                      <line x1="5.5" y1="18.5" x2="18.5" y2="18.5"></line>
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: 17.5, fontWeight: 800, color: "#0F172A", letterSpacing: "-0.2px" }}>
+                      Other Sites
+                    </h3>
+                    <p style={{ margin: "4px 0 0", fontSize: 12, fontWeight: 500, color: "#475569", lineHeight: 1.45 }}>
+                      Generic public portals catering to weddings, birthdays, and unverified listings.
+                    </p>
+                  </div>
+                </div>
+
+                {/* 7 Columns for Other Sites - High-Contrast Visible Badges & Crisp Text */}
+                {[
+                  "Weddings, birthdays, everything",
+                  "Browse listings yourself for days",
+                  "Open unverified marketplace",
+                  "Listed rack rates / call to know",
+                  "You coordinate with venue directly",
+                  "No dedicated support team",
+                  "Self-service only"
+                ].map((val, idx) => (
+                  <div key={idx} style={{
+                    textAlign: "center",
+                    padding: "24px 10px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderLeft: "1px solid #E2E8F0"
+                  }}>
+                    {/* Circled High-Contrast Cross Badge */}
+                    <div style={{
+                      width: 34,
+                      height: 34,
+                      borderRadius: "50%",
+                      background: "#F1F5F9",
+                      border: "2px solid #94A3B8",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "#334155",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.05)"
+                    }}>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </div>
+                    <span style={{ fontSize: 12.5, fontWeight: 700, color: "#1E293B", marginTop: 10, lineHeight: 1.35, display: "block" }}>
+                      {val}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </Sec>
 

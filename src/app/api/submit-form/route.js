@@ -49,7 +49,17 @@ function xmlRpc(endpoint, method, params) {
 
 function venueDetailsLines(p) {
   if (p.isPartial) {
-    return ['Lead Status: Step 1 Lead Capture (Contact & Venue Type captured, details pending)'];
+    return [
+      'Lead Status: Partial Lead Capture (Contact captured, details pending)',
+      ...(p.occasion ? [`Occasion: ${p.occasion}`] : []),
+    ];
+  }
+  if (p.occasion) {
+    return [
+      `Occasion: ${p.occasion}`,
+      ...(p.date ? [`Date: ${p.date}`] : []),
+      ...(p.noOfPeople ? [`No. of People: ${p.noOfPeople}`] : []),
+    ];
   }
   const t = p.formType;
   if (t === 'villa') {
@@ -105,7 +115,7 @@ function venueDetailsHtml(p) {
 
 async function pushToOdoo(p, subdomainSource) {
   try {
-    const venueLabel = VENUE_LABEL[p.formType] || p.event || 'Venue Enquiry';
+    const venueLabel = p.occasion || VENUE_LABEL[p.formType] || p.event || 'Venue Enquiry';
     const uid = await xmlRpc('/xmlrpc/2/common', 'authenticate', [ODOO_DB, ODOO_USERNAME, ODOO_API_KEY, {}]);
     if (!uid) return;
     const leadName = `[${subdomainSource}] ${venueLabel} — ${p.city || 'Mumbai'}${p.isPartial ? ' (Partial Capture)' : ''}`;
@@ -123,7 +133,7 @@ async function pushToOdoo(p, subdomainSource) {
       `Source (Heard via): ${p.source || '—'}`,
       `Domain Source: ${subdomainSource}`,
       `Venue Type: ${venueLabel}`,
-      `Lead Type: ${p.isPartial ? 'Step 1 capture (partial)' : 'Complete lead'}`,
+      `Lead Type: ${p.isPartial ? 'Partial capture' : 'Complete lead'}`,
       ...venueDetailsLines(p),
       ...(utmLines.length ? ['--- Ad Tracking ---', ...utmLines] : []),
       `WhatsApp Updates: ${p.whatsapp ? 'Yes' : 'No'}`,
@@ -183,6 +193,7 @@ export async function POST(req) {
       email,
       source,
       formType,
+      occasion,
       event,
       city,
       date,
@@ -213,15 +224,15 @@ export async function POST(req) {
         { status: 400 }
       );
     }
-    if (!formType && !event) {
+    if (!occasion && !formType && !event) {
       return Response.json(
-        { error: 'Venue type is required.' },
+        { error: 'Occasion or venue type is required.' },
         { status: 400 }
       );
     }
 
-    const isWaInquiry = !!(payload.isWaInquiry || (!formType && (event === 'WhatsApp Inquiry' || !email)));
-    const venueLabel = VENUE_LABEL[formType] || event || 'Venue Enquiry';
+    const isWaInquiry = !isPartial && !!(payload.isWaInquiry || (!formType && !occasion && (event === 'WhatsApp Inquiry' || !email)));
+    const venueLabel = occasion || VENUE_LABEL[formType] || event || 'Corporate Party Enquiry';
     const indianTime = getIndianTime();
     const statusSuffix = isPartial ? ' (Partial Lead)' : '';
 
@@ -376,11 +387,12 @@ export async function POST(req) {
     // 3. Send to Google Sheets
     await sendToGoogleSheets(
       {
-        formType: venueLabel + statusSuffix,
+        formType: (payload.occasion || venueLabel) + statusSuffix,
+        occasion: payload.occasion || '',
         name,
         phone,
         email: email || '',
-        source: source || '',
+        source: source || 'Website',
         venueDetails: venueDetailsLines(payload).join(' | '),
         contactCity: city || payload.location || 'Mumbai',
         date: date || payload.checkInDate || '',
@@ -413,9 +425,9 @@ export async function POST(req) {
         utmContent:  utmContent  || '',
         gclid:       gclid       || '',
         submittedAt: indianTime,
-        pageSource: `${subdomainSource} - ${formType ? (isPartial ? 'Hero Form (Partial Step 1)' : 'Hero Form (Dynamic)') : 'WhatsApp Popup'}`,
+        pageSource: `${subdomainSource} - ${payload.occasion ? (isPartial ? 'Hero Form (Partial Lead)' : 'Hero Form (Occasion)') : formType ? (isPartial ? 'Hero Form (Partial Step 1)' : 'Hero Form (Dynamic)') : 'WhatsApp Popup'}`,
       },
-      formType ? `${formType} enquiry` : 'wa popup enquiry'
+      payload.occasion ? `${payload.occasion} enquiry` : formType ? `${formType} enquiry` : 'wa popup enquiry'
     );
 
     return Response.json({ success: true, message: 'Enquiry submitted! We will contact you within 30 minutes.' });
