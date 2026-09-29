@@ -563,11 +563,63 @@ export default function BMCPLanding() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showWaPopup, setShowWaPopup] = useState(false);
   const [waForm, setWaForm] = useState({ name: '', phone: '', event: '' });
-  const SHOW_EXPERT_CHAT = false; // Set to true when ready to display "Talk to Expert"
+  const SHOW_EXPERT_CHAT = true; // Set to true to display "Talk to Expert"
   const [tidioNotice, setTidioNotice] = useState(false);
+  const [isTidioOpen, setIsTidioOpen] = useState(false);
+  const [showFloatingActions, setShowFloatingActions] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (typeof window !== "undefined") {
+        // Show buttons as soon as hero is scrolled (80px)
+        setShowFloatingActions(window.scrollY > 80);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const handleOpen = () => setIsTidioOpen(true);
+    const handleClose = () => {
+      setIsTidioOpen(false);
+      if (typeof window !== "undefined" && (window as any).tidioChatApi) {
+        (window as any).tidioChatApi.hide();
+      }
+    };
+
+    document.addEventListener("tidio-chat-open", handleOpen);
+    document.addEventListener("tidio-chat-close", handleClose);
+
+    const bindApi = () => {
+      const api = (window as any).tidioChatApi;
+      if (api) {
+        api.on("open", handleOpen);
+        api.on("close", handleClose);
+      }
+    };
+
+    if (typeof window !== "undefined") {
+      if ((window as any).tidioChatApi) {
+        bindApi();
+      } else {
+        document.addEventListener("tidioChat-ready", bindApi);
+      }
+    }
+
+    return () => {
+      document.removeEventListener("tidio-chat-open", handleOpen);
+      document.removeEventListener("tidio-chat-close", handleClose);
+      document.removeEventListener("tidioChat-ready", bindApi);
+    };
+  }, []);
 
   const handleOpenExpertChat = () => {
     if (typeof window !== "undefined" && (window as any).tidioChatApi) {
+      setIsTidioOpen(true);
       (window as any).tidioChatApi.show();
       (window as any).tidioChatApi.open();
     } else {
@@ -1667,7 +1719,7 @@ export default function BMCPLanding() {
                     transition: "all 0.2s"
                   }}
                 >
-                  {formStatus === 'submitting' ? 'Submitting...' : 'GET 5 FREE QUOTES ON WHATSAPP →'}
+                  {formStatus === 'submitting' ? 'Submitting...' : 'Submit'}
                 </button>
                 <p style={{ fontSize: 11, color: G, fontStyle: "italic", textAlign: "center", margin: "8px 0 4px", fontWeight: 500 }}>
                   Free for HR &amp; Admin teams • Takes 60 seconds • No obligation
@@ -2639,7 +2691,23 @@ export default function BMCPLanding() {
       </footer>
 
       {/* ===== FLOATING ACTION BUTTONS (TALK TO EXPERT + WHATSAPP) ===== */}
-      <div className="floating-actions-container" style={{ position: "fixed", bottom: 28, right: 28, display: "flex", alignItems: "center", gap: 12, zIndex: 1000 }}>
+      <div
+        className="floating-actions-container"
+        style={{
+          position: "fixed",
+          bottom: 28,
+          right: 28,
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          zIndex: 1000,
+          transition: "opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s",
+          opacity: showFloatingActions && !isTidioOpen ? 1 : 0,
+          pointerEvents: showFloatingActions && !isTidioOpen ? "auto" : "none",
+          visibility: showFloatingActions && !isTidioOpen ? "visible" : "hidden",
+          transform: showFloatingActions && !isTidioOpen ? "translateY(0) scale(1)" : "translateY(16px) scale(0.95)",
+        }}
+      >
         {/* Notice toast if Tidio is loading or key not configured */}
         {SHOW_EXPERT_CHAT && tidioNotice && (
           <div
@@ -2700,23 +2768,19 @@ export default function BMCPLanding() {
           </div>
         )}
 
-        {/* 1. Talk to Expert (Tidio Chatbot Trigger) — Hidden for now */}
+        {/* 1. Quick Help (Tidio Chatbot Trigger) */}
         {SHOW_EXPERT_CHAT && (
           <button
             onClick={handleOpenExpertChat}
             className="expert-fab"
-            aria-label="Talk to Expert"
-            title="Talk to Expert"
+            aria-label="Quick Help"
+            title="Quick Help"
           >
-            <div className="expert-fab-dot-wrapper">
-              <div className="expert-fab-dot" />
-              <div className="expert-fab-dot-pulse" />
-            </div>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
             </svg>
-            <span className="fab-full-text">Talk to Expert</span>
-            <span className="fab-short-text">Expert</span>
+            <span className="fab-full-text">Quick Help</span>
+            <span className="fab-short-text">Help</span>
           </button>
         )}
 

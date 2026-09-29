@@ -34,8 +34,12 @@ export default function TidioChat() {
       if (window.tidioChatApi) {
         // Hide default launcher bubble so custom "Talk to Expert" triggers it
         window.tidioChatApi.hide();
+        window.tidioChatApi.on("open", () => {
+          document.dispatchEvent(new CustomEvent("tidio-chat-open"));
+        });
         window.tidioChatApi.on("close", () => {
           window.tidioChatApi?.hide();
+          document.dispatchEvent(new CustomEvent("tidio-chat-close"));
         });
       }
     };
